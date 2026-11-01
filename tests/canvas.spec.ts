@@ -10,13 +10,13 @@ test("open a file, browse a folder, close a window", async ({ page }) => {
 
   await page.getByRole("button", { name: "Projects" }).dblclick();
   const explorer = page.getByRole("dialog", { name: "~/projects" });
-  await explorer.getByRole("button", { name: "live-subtitles/" }).click();
-  await expect(explorer).toContainText("~/projects/live-subtitles");
+  await explorer.getByRole("button", { name: "browser-testing-agent/" }).click();
+  await expect(explorer).toContainText("~/projects/browser-testing-agent");
   await explorer.getByRole("button", { name: "[^ up]" }).click();
-  await expect(explorer.getByRole("button", { name: "browser-testing-agent/" })).toBeVisible();
+  await expect(explorer.getByRole("button", { name: "rag-engine/" })).toBeVisible();
   await explorer.getByRole("button", { name: "[< back]" }).click();
   await explorer.getByRole("button", { name: "README.md" }).click();
-  await expect(page.getByRole("dialog", { name: "~/projects/live-subtitles/README.md" }).getByRole("heading", { name: "Live Subtitles" })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent/README.md" }).getByRole("heading", { name: "Browser Testing Agent (browser-harness)" })).toBeVisible();
 
   await page.getByRole("button", { name: "Close ~/about.txt" }).click();
   await expect(about).toBeHidden();
@@ -48,7 +48,7 @@ test("window drags by title bar, layout persists, reset restores it", async ({ p
 test(".url opens a new tab", async ({ page, context }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Projects" }).dblclick();
-  await page.getByRole("button", { name: "live-subtitles/" }).click();
+  await page.getByRole("button", { name: "browser-testing-agent/" }).click();
   const popup = context.waitForEvent("page");
   await page.getByRole("button", { name: "github.url" }).click();
   expect((await popup).url()).toContain("github.com");
@@ -69,7 +69,7 @@ test("projects are desktop apps: README plus launch buttons", async ({ page, con
     await app.getByRole("button", { name: `Close ~/${path}` }).click();
   }
 
-  await page.getByRole("button", { name: "Live Subtitles", exact: true }).dblclick();
-  await page.getByRole("dialog", { name: "~/projects/live-subtitles" }).getByRole("button", { name: "▶ run demo" }).click();
-  await expect(page.getByRole("dialog", { name: "~/projects/live-subtitles/demo" })).toBeVisible();
+  await page.getByRole("button", { name: "Test Agent", exact: true }).dblclick();
+  await page.getByRole("dialog", { name: "~/projects/browser-testing-agent" }).getByRole("button", { name: "▶ run replay" }).click();
+  await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent/replay" })).toBeVisible();
 });

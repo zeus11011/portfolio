@@ -29,8 +29,8 @@ test.describe("shell", () => {
     await type(page, "cd projects");
     await expect(term(page)).toContainText("guest@anish:~/projects$");
     await type(page, "ls");
-    await term(page).getByRole("button", { name: "live-subtitles/" }).click();
-    await expect(page.getByRole("dialog", { name: "~/projects/live-subtitles" })).toBeVisible();
+    await term(page).getByRole("button", { name: "browser-testing-agent/" }).click();
+    await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent" })).toBeVisible();
     await type(page, "cat ../about.txt");
     await expect(term(page)).toContainText("Software and AI developer.");
     await type(page, "cd nope");
@@ -40,9 +40,9 @@ test.describe("shell", () => {
   test("open resume, run an executable by name, unknown command", async ({ page }) => {
     await type(page, "open resume");
     await expect(page.getByRole("dialog", { name: "~/resume.pdf" })).toBeVisible();
-    await type(page, "cd projects/live-subtitles");
-    await type(page, "demo");
-    await expect(page.getByRole("dialog", { name: "~/projects/live-subtitles/demo" })).toBeVisible();
+    await type(page, "cd projects/browser-testing-agent");
+    await type(page, "replay");
+    await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent/replay" })).toBeVisible();
     await type(page, "frobnicate");
     await expect(term(page)).toContainText("bash: frobnicate: command not found");
   });
@@ -79,11 +79,11 @@ test.describe("shell", () => {
     await expect(input).toHaveValue("cd projects/");
     await input.press("Tab");
     await expect(input).toHaveValue("cd projects/");
-    await expect(term(page)).toContainText("live-subtitles/  browser-testing-agent/  rag-engine/  chip-8-emulator/  more/");
+    await expect(term(page)).toContainText("browser-testing-agent/  rag-engine/  chip-8-emulator/  more/");
 
-    await input.fill("cat projects/live-subtitles/R");
+    await input.fill("cat projects/rag-engine/R");
     await input.press("Tab");
-    await expect(input).toHaveValue("cat projects/live-subtitles/README.md ");
+    await expect(input).toHaveValue("cat projects/rag-engine/README.md ");
 
     await input.fill("c");
     await input.press("Tab");

@@ -20,7 +20,7 @@
     "projects": {
       "type": "dir",
       "children": {
-        "live-subtitles": {
+        ".live-subtitles": {
           "type": "dir",
           "children": {
             "README.md": {

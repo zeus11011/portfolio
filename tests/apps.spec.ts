@@ -12,8 +12,8 @@ async function sh(page: Page, cmd: string) {
 }
 
 test("subtitles demo plays captions", async ({ page }) => {
-  await sh(page, "open projects/live-subtitles/demo");
-  const win = page.getByRole("dialog", { name: "~/projects/live-subtitles/demo" });
+  await sh(page, "open projects/.live-subtitles/demo");
+  const win = page.getByRole("dialog", { name: "~/projects/.live-subtitles/demo" });
   await win.getByRole("button", { name: "[ play ]" }).click();
   await expect(win).toContainText("sample caption track", { timeout: 5000 });
   await expect(win.getByRole("button", { name: "[ pause ]" })).toBeVisible();

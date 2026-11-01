@@ -13,7 +13,7 @@ export default function Explorer({ path: start, near }: { path: string; near: XY
   const [icons, setIcons] = useState(false);
   const path = history[history.length - 1];
   const node = resolve(path);
-  const names = node?.type === "dir" ? Object.keys(node.children) : [];
+  const names = node?.type === "dir" ? Object.keys(node.children).filter((n) => !n.startsWith(".")) : [];
   const go = (p: string) => setHistory((h) => [...h, p]);
 
   function activate(name: string) {

@@ -19,7 +19,7 @@ export const defaultNodes: Node[] = [
   icon("ask", "ask-me", "Ask Me (AI)", 40, 280),
   icon("trash", ".trash", "Recycle Bin", 160, 280),
   // projects as apps
-  icon("app-subs", "projects/live-subtitles", "Live Subtitles", 320, 40, "[cc]"),
+  // hidden for now: icon("app-subs", "projects/.live-subtitles", "Live Subtitles", 320, 40, "[cc]"),
   icon("app-agent", "projects/browser-testing-agent", "Test Agent", 440, 40, "[>]"),
   icon("app-rag", "projects/rag-engine", "RAG Engine", 320, 160, "[?]"),
   icon("app-chip8", "projects/chip-8-emulator", "CHIP-8", 440, 160, "[8]"),
@@ -70,7 +70,7 @@ export const useLayout = create<Layout>()(
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 6,
+      version: 7,
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes }),
       migrate: () => ({ nodes: defaultNodes }), // old saved layouts: start fresh
