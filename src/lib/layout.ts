@@ -33,9 +33,13 @@ const desktop: Node[] = [
 ];
 
 /** Desktop layout on wide screens; on phones/tablets the icons reflow into a grid with the terminal below. */
+const columns = (w: number) => Math.max(1, Math.floor((w - 20) / 120));
+/** Which default layout fits this width; a saved layout made for another mode is redone. */
+const layoutMode = (w: number) => (w >= 1200 ? "desktop" : `grid-${columns(w)}`);
+
 export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWidth): Node[] {
   if (w >= 1200) return desktop;
-  const cols = Math.max(1, Math.floor((w - 20) / 120));
+  const cols = columns(w);
   const icons = desktop.filter((n) => n.type === "icon");
   const rows = Math.ceil(icons.length / cols);
   return [
@@ -44,8 +48,27 @@ export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWid
   ];
 }
 
+type Box = { x: number; y: number; w: number; h: number };
+const box = (n: Node): Box => ({ x: n.position.x, y: n.position.y, w: n.measured?.width ?? 96, h: n.measured?.height ?? 96 });
+const hit = (a: Box, b: Box) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+/** Where a dropped icon goes: where it is, or the nearest 20px grid spot on screen that no other icon covers. */
+export function freeSpot(node: Node, nodes: Node[], w: number, h: number): XYPosition {
+  const me = box(node);
+  const others = nodes.filter((n) => n.type === "icon" && n.id !== node.id).map(box);
+  const free = (x: number, y: number) => !others.some((o) => hit({ ...me, x, y }, o));
+  if (free(me.x, me.y)) return node.position;
+  // ponytail: brute-force scan of every grid spot (~5k on a big screen), fine for a dozen icons on drop
+  const spots: XYPosition[] = [];
+  for (let x = 0; x + me.w <= w; x += 20) for (let y = 0; y + me.h <= h; y += 20) spots.push({ x, y });
+  const d = (p: XYPosition) => (p.x - me.x) ** 2 + (p.y - me.y) ** 2;
+  return spots.sort((a, b) => d(a) - d(b)).find((p) => free(p.x, p.y)) ?? node.position;
+}
+
 type Layout = {
   nodes: Node[];
+  mode: string;
+  fit: () => void;
   onNodesChange: (changes: NodeChange[]) => void;
   open: (path: string, near: XYPosition) => void;
   close: (id: string) => void;
@@ -55,8 +78,21 @@ type Layout = {
 export const useLayout = create<Layout>()(
   persist(
     (set, get) => ({
-      nodes: desktop, // SSR markup; Canvas resets to the screen-sized default on first visit
-      onNodesChange: (changes) => set({ nodes: applyNodeChanges(changes, get().nodes) }),
+      nodes: desktop, // SSR markup; Canvas calls fit() after mount
+      mode: "",
+      // screen changed layout mode (phone/tablet/desktop, rotation, devtools device view): re-lay icons, keep open windows
+      fit: () => {
+        const mode = layoutMode(innerWidth);
+        if (get().mode !== mode) set({ mode, nodes: [...defaultNodes(), ...get().nodes.filter((n) => n.type === "window")] });
+      },
+      onNodesChange: (changes) => {
+        let nodes = applyNodeChanges(changes, get().nodes);
+        // icon dropped (drag ended): never leave it on top of another icon
+        for (const c of changes)
+          if (c.type === "position" && c.dragging === false)
+            nodes = nodes.map((n) => (n.id === c.id && n.type === "icon" ? { ...n, position: freeSpot(n, nodes, innerWidth, innerHeight) } : n));
+        set({ nodes });
+      },
       open: (path, near) => {
         const node = resolve(path);
         if (!node) return;
@@ -77,15 +113,15 @@ export const useLayout = create<Layout>()(
         });
       },
       close: (id) => set({ nodes: get().nodes.filter((n) => n.id !== id) }),
-      reset: () => set({ nodes: defaultNodes() }),
+      reset: () => set({ mode: layoutMode(innerWidth), nodes: defaultNodes() }),
     }),
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 7,
+      version: 8,
       skipHydration: true,
-      partialize: (s) => ({ nodes: s.nodes }),
-      migrate: () => ({ nodes: defaultNodes() }), // old saved layouts: start fresh
+      partialize: (s) => ({ nodes: s.nodes, mode: s.mode }),
+      migrate: () => ({ mode: "" }), // old saved layouts: fit() starts fresh
     },
   ),
 );

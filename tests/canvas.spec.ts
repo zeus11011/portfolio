@@ -73,3 +73,21 @@ test("projects are desktop apps: README plus launch buttons", async ({ page, con
   await page.getByRole("dialog", { name: "~/projects/browser-testing-agent" }).getByRole("button", { name: "▶ run replay" }).click();
   await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent/replay" })).toBeVisible();
 });
+
+test("an icon dropped on another icon moves to a free spot", async ({ page }) => {
+  await page.goto("/");
+  const about = page.getByRole("button", { name: "About Me.txt" });
+  const resume = page.getByRole("button", { name: "Resume.pdf" });
+  const a = (await about.boundingBox())!;
+  const r = (await resume.boundingBox())!;
+  await page.mouse.move(a.x + 20, a.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(r.x + 20, r.y + 20, { steps: 10 });
+  await page.mouse.up();
+  await expect(async () => {
+    const icons = await page.locator(".react-flow__node-icon").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().toJSON()));
+    for (const [i, p] of icons.entries())
+      for (const q of icons.slice(i + 1))
+        expect(p.x < q.x + q.width && q.x < p.x + p.width && p.y < q.y + q.height && q.y < p.y + p.height).toBe(false);
+  }).toPass();
+});

@@ -16,19 +16,17 @@ const onResize = (cb: () => void) => (addEventListener("resize", cb), () => remo
 const screenSize = () => `${innerWidth}x${innerHeight}`;
 
 export function Canvas() {
-  const { nodes, onNodesChange, reset } = useLayout();
+  const { nodes, onNodesChange, reset, fit } = useLayout();
   const [w, h] = useSyncExternalStore(onResize, screenSize, () => "1280x800").split("x").map(Number);
   // keep nodes inside the screen
   const bounds: [[number, number], [number, number]] = [[0, 0], [w, h]];
 
   useEffect(() => {
-    let saved = null;
-    try {
-      saved = localStorage.getItem("layout");
-    } catch {}
-    if (saved) useLayout.persist.rehydrate();
-    else reset(); // first visit: lay out for this screen size
-  }, [reset]);
+    Promise.resolve(useLayout.persist.rehydrate()).then(fit);
+  }, [fit]);
+  useEffect(() => {
+    if (useLayout.persist.hasHydrated()) fit();
+  }, [w, fit]);
 
   return (
     <ReactFlow

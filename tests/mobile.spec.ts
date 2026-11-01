@@ -27,5 +27,21 @@ for (const [name, viewport] of [
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       expect(overflow).toBe(0);
     });
+
+    test("a layout saved on desktop is re-laid out for this screen", async ({ page }) => {
+      await page.addInitScript(() => sessionStorage.setItem("booted", "1"));
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await page.goto("/");
+      await page.getByRole("button", { name: "About Me.txt" }).dblclick(); // saves the desktop layout
+      await page.setViewportSize(viewport); // like switching devtools to a device
+      const terminal = page.getByRole("dialog", { name: "guest@anish: ~" });
+      const icon = page.getByRole("button", { name: "CHIP-8" });
+      await expect(async () => {
+        const t = (await terminal.boundingBox())!;
+        const i = (await icon.boundingBox())!;
+        expect(t.y).toBeGreaterThanOrEqual(i.y + i.height); // terminal sits below the icon grid, not on top of it
+      }).toPass();
+      await expect(page.getByRole("dialog", { name: "~/about.txt" })).toBeVisible(); // open windows kept
+    });
   });
 }
