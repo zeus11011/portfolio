@@ -94,9 +94,10 @@ export function TerminalNode({ positionAbsoluteX: x, positionAbsoluteY: y }: Nod
   }
 
   return (
-    <div className="w-[min(520px,calc(100vw-16px))] text-xl" onClick={() => !getSelection()?.toString() && inputRef.current?.focus()}>
+    <div className="w-[min(520px,calc(100vw-16px))] text-xl max-md:text-2xl" onClick={() => !getSelection()?.toString() && inputRef.current?.focus()}>
       <Window title="guest@anish: ~">
-        <div ref={outRef} className="nodrag nowheel h-[min(18rem,35vh)] cursor-text overflow-auto select-text">
+        {/* phones: 3 icon rows (~440px, see grid() in layout.ts) + window chrome + bottom bar take ~34rem; the terminal gets the rest */}
+        <div ref={outRef} className="nodrag nowheel h-[min(18rem,35vh)] cursor-text max-md:h-[clamp(6rem,calc(100dvh-34rem),18rem)] overflow-auto select-text">
           {/* screen readers get whole lines here instead of the typewriter */}
           <div aria-live="polite" className="sr-only">
             {lines.slice(0, typed.line).map((l, i) => (

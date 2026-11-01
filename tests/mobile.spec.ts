@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 for (const [name, viewport] of [
   ["phone", { width: 390, height: 844 }],
+  ["small phone", { width: 360, height: 640 }],
   ["tablet", { width: 768, height: 1024 }],
 ] as const) {
   test.describe(name, () => {
@@ -45,3 +46,36 @@ for (const [name, viewport] of [
     });
   });
 }
+
+test("tablet-sized window with a mouse: one click opens an icon", async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("booted", "1"));
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  // dragging is not a click: moving the icon must not open it
+  const resume = page.getByRole("button", { name: "Resume.pdf" });
+  const r = (await resume.boundingBox())!;
+  await page.mouse.move(r.x + 20, r.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(r.x + 20, r.y + 400, { steps: 10 });
+  await page.mouse.up();
+  await expect(page.getByRole("dialog", { name: "~/resume.pdf" })).toBeHidden();
+
+  await page.getByRole("button", { name: "About Me.txt" }).click();
+  await expect(page.getByRole("dialog", { name: "~/about.txt" })).toBeVisible();
+});
+
+test("width change reloads the page, height-only change does not", async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("booted", "1"));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  await page.evaluate(() => ((window as unknown as { marker: number }).marker = 1));
+  const marker = () => page.evaluate(() => (window as unknown as { marker?: number }).marker);
+
+  await page.setViewportSize({ width: 1280, height: 600 }); // like a phone keyboard opening
+  await page.waitForTimeout(600);
+  expect(await marker()).toBe(1);
+
+  await page.setViewportSize({ width: 390, height: 600 });
+  await expect.poll(marker).toBeUndefined();
+  await expect(page.getByRole("button", { name: "Resume.pdf" })).toBeVisible();
+});

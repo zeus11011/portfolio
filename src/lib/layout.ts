@@ -32,19 +32,22 @@ const desktop: Node[] = [
   { id: "terminal", type: "terminal", position: { x: 640, y: 180 }, dragHandle: ".window-title", data: {} },
 ];
 
-/** Desktop layout on wide screens; on phones/tablets the icons reflow into a grid with the terminal below. */
-const columns = (w: number) => Math.max(1, Math.floor((w - 20) / 120));
+/** Grid cells for the reflowed layout. Phones (< 768px, Tailwind's md) get bigger icons (w-28 = 112px): tighter margin, taller rows, 3 columns down to 360px. */
+const grid = (w: number) => (w < 768 ? { x0: 8, cw: 116, rh: 140 } : { x0: 20, cw: 120, rh: 120 });
+const columns = (w: number) => Math.max(1, Math.floor((w - grid(w).x0) / grid(w).cw));
 /** Which default layout fits this width; a saved layout made for another mode is redone. */
-const layoutMode = (w: number) => (w >= 1200 ? "desktop" : `grid-${columns(w)}`);
+const layoutMode = (w: number) => (w >= 1200 ? "desktop" : `grid-${columns(w)}x${grid(w).rh}`);
 
+/** Desktop layout on wide screens; on phones/tablets the icons reflow into a grid with the terminal below. */
 export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWidth): Node[] {
   if (w >= 1200) return desktop;
+  const { x0, cw, rh } = grid(w);
   const cols = columns(w);
   const icons = desktop.filter((n) => n.type === "icon");
   const rows = Math.ceil(icons.length / cols);
   return [
-    ...icons.map((n, i) => ({ ...n, position: { x: 20 + (i % cols) * 120, y: 20 + Math.floor(i / cols) * 120 } })),
-    { ...desktop.find((n) => n.id === "terminal")!, position: { x: 8, y: 20 + rows * 120 } },
+    ...icons.map((n, i) => ({ ...n, position: { x: x0 + (i % cols) * cw, y: 20 + Math.floor(i / cols) * rh } })),
+    { ...desktop.find((n) => n.id === "terminal")!, position: { x: 8, y: 20 + rows * rh } },
   ];
 }
 

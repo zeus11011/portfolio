@@ -27,6 +27,18 @@ export function Canvas() {
   useEffect(() => {
     if (useLayout.persist.hasHydrated()) fit();
   }, [w, fit]);
+  // width changed (resize, rotation, devtools device): reload once resizing settles.
+  // Height-only changes are ignored: phone address bars and on-screen keyboards change the height.
+  useEffect(() => {
+    const start = innerWidth;
+    let t: ReturnType<typeof setTimeout>;
+    const onWidth = () => {
+      clearTimeout(t);
+      t = setTimeout(() => innerWidth !== start && location.reload(), 300);
+    };
+    addEventListener("resize", onWidth);
+    return () => (removeEventListener("resize", onWidth), clearTimeout(t));
+  }, []);
 
   return (
     <ReactFlow
@@ -49,7 +61,7 @@ export function Canvas() {
       colorMode="dark"
     >
       <Background color="var(--dim)" gap={20} size={1} />
-      <Panel position="bottom-left" className="flex gap-4 text-xl text-dim">
+      <Panel position="bottom-left" className="flex gap-4 text-xl text-dim max-md:text-2xl">
         <button onClick={reset} className="hover:bg-foreground hover:text-background">
           reset layout
         </button>
