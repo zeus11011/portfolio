@@ -29,8 +29,18 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploying
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This repo is private. `.github/workflows/nextjs.yml` builds the static site and pushes only `out/`
+to the public repo `zeus11011/zeus11011.github.io` (branch `gh-pages`), which GitHub Pages serves.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+One-time setup:
+1. Create the public repo `zeus11011.github.io` (empty).
+2. Create a fine-grained token: GitHub > Settings > Developer settings > Personal access tokens >
+   Fine-grained, repository access = only `zeus11011.github.io`, permission Contents: Read and write.
+3. In this repo: Settings > Secrets and variables > Actions > New secret `PAGES_TOKEN` = that token.
+4. Push to `main` (or run the workflow from the Actions tab). After the first run, in the public repo:
+   Settings > Pages > Source: Deploy from a branch, branch `gh-pages`, folder `/ (root)`.
+5. Make this repo private: Settings > General > Danger Zone > Change visibility.
+
+Site: https://zeus11011.github.io/
