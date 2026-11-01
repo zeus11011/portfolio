@@ -1,0 +1,134 @@
+{
+  "type": "dir",
+  "children": {
+    "about.txt": {
+      "type": "file",
+      "content": "# Anish Naik\n\nSoftware and AI developer.\n\nAt Infuse (useMango) I build and run production Python APIs, React frontends and CI/CD on AWS. On my own I build AI agents and RAG systems: a LangGraph agent that tests web apps in a real browser, and a RAG app that answers questions over PDFs.\n\nLooking for backend, full-stack and applied AI engineering roles, remote or anywhere in India."
+    },
+    "resume.pdf": {
+      "type": "pdf",
+      "src": "/resume.pdf"
+    },
+    "contact.sh": {
+      "type": "exe",
+      "app": "mail"
+    },
+    "ask-me": {
+      "type": "exe",
+      "app": "ask-me"
+    },
+    "projects": {
+      "type": "dir",
+      "children": {
+        "live-subtitles": {
+          "type": "dir",
+          "children": {
+            "README.md": {
+              "type": "file",
+              "content": "# Live Subtitles\n\nReal-time captions for audio and video.\n\n## Why\nTODO\n\n## Stack\nTODO\n\n## Results\nTODO"
+            },
+            "demo": {
+              "type": "exe",
+              "app": "subtitles-demo"
+            },
+            "github.url": {
+              "type": "url",
+              "href": "https://github.com/zeus11011"
+            }
+          }
+        },
+        "browser-testing-agent": {
+          "type": "dir",
+          "children": {
+            "README.md": {
+              "type": "file",
+              "content": "# Browser Testing Agent (browser-harness)\n\nAn agent that drives a real browser to test web apps and reports pass/fail.\n\n## Why\nManual test cases are written in plain English and run by hand. This agent takes those same plain-English cases and executes them as real browser flows.\n\n## How it works\n- A multi-node LangGraph agent: planner -> executor -> verifier.\n- The verifier routes each step to pass, retry or replan.\n- The executor takes exactly one atomic step per turn, so a failure is isolated to that step and can be retried or re-planned instead of re-running the whole case.\n- Browser tools come from browser_ops, a FastMCP server wrapping Selenium WebDriver (Chrome): navigation, click/type, waits and assertions over MCP, with a structured {by, value} locator model across 8 lookup strategies.\n- Each node's system prompt is composed from versioned Markdown skill files, so prompts are edited as docs, not hardcoded strings.\n\n## Stack\nPython, LangGraph, FastMCP (Model Context Protocol), Selenium WebDriver. Provider-agnostic LLM via init_chat_model: runs on Gemini, OpenAI, Anthropic or AWS Bedrock models without code changes.\n\n## Results\n- Termination is guaranteed, not hoped for: hard caps of 2 retries per step and 2 replans per case.\n- Failures stay isolated to a single step."
+            },
+            "replay": {
+              "type": "exe",
+              "app": "agent-terminal"
+            },
+            "github.url": {
+              "type": "url",
+              "href": "https://github.com/zeus11011/browser-harness"
+            }
+          }
+        },
+        "rag-engine": {
+          "type": "dir",
+          "children": {
+            "README.md": {
+              "type": "file",
+              "content": "# rag-engine\n\nA retrieval-augmented generation (RAG) app that answers questions about your documents (.pdf, .md, .txt), with sources.\n\n## How it works\n- **Ingest:** file → text (one entry per PDF page) → chunks → embedded into a ChromaDB vector store.\n- **Query:** question → top-k similar chunks → prompt with `[source]` tags → LLM → answer, streamed to the UI as NDJSON.\n- **Context-enriched chunks (PDFs):** the LLM writes a 1–2 sentence context for each chunk from the whole document and it's prepended before embedding, so chunks like \"it costs $5\" stay findable.\n- **Chunking methods**, chosen per upload: recursive (default), markdown-aware, paragraph, or fixed size (800 chars, 100 overlap).\n- **Model-agnostic:** chat and embedding models are swapped through config as `provider:model` (Ollama, Anthropic, OpenAI). Default is local: Llama 3.2 + nomic-embed-text on Ollama.\n- Input sanitization defends against prompt injection in user queries.\n\n## Stack\nReact (Vite) frontend; FastAPI + LangChain backend; ChromaDB; Ollama for local models.\n\n## Results\nTODO: accuracy and retrieval metrics coming with the GitHub release."
+            },
+            "github.url": {
+              "type": "url",
+              "href": "https://github.com/zeus11011/rag-engine"
+            }
+          }
+        },
+        "more": {
+          "type": "dir",
+          "children": {
+            "README.md": {
+              "type": "file",
+              "content": "# More projects\n\n- chip-8-emulator: CHIP-8 emulator in Rust"
+            },
+            "chip-8-emulator": {
+              "type": "dir",
+              "children": {
+                "README.md": {
+                  "type": "file",
+                  "content": "# CHIP-8 Emulator\n\nA CHIP-8 emulator written in Rust.\n\n## How it works\n- CPU instruction decoding and opcode execution.\n- Memory management.\n- Real-time timers and display buffer rendering.\n\n## Stack\nRust, chosen for speed and strong type safety to keep the emulator efficient and stable."
+                },
+                "github.url": {
+                  "type": "url",
+                  "href": "https://github.com/zeus11011/chip_8_emu"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "experience": {
+      "type": "dir",
+      "children": {
+        "current-company.txt": {
+          "type": "file",
+          "content": "# Software Engineer, Infuse (useMango)\nGoa, India · Aug 2023 - Present\n\nWork across product and service verticals: backend systems, frontend performance, QA automation, cloud-native integrations and R&D.\n\n- Developed and maintained Python APIs, reducing response latency by 25% and improving integration reliability.\n- Built and automated CI/CD pipelines, cutting deployment time by 50% and increasing release consistency.\n- Wrote infrastructure as code in AWS CloudFormation and AWS CDK for these pipelines and automated the deployment of microservices.\n- Troubleshooting and root cause analysis: 97% of production issues resolved within SLA.\n- Improved React frontend performance, reducing load time by 30%.\n- Implemented Redis-backed rate limiting and authentication, with token/session validation; maintain the auth flow of the Backend-for-Frontend (BFF) layer.\n- Implemented Pact contract testing in AWS CI/CD pipelines, and deployed a Dockerized Pact Broker behind NGINX with HTTPS.\n- Refactored core modules, reducing technical debt by 30%."
+        },
+        "bloombit.txt": {
+          "type": "file",
+          "content": "# Full Stack Intern, BloomBit\nGoa, India · May 2022 - May 2023\n\n- Developed a cruise booking mobile app in React Native (bare workflow): a client app and an admin app.\n- Built cruise selection, booking flow, pre-booking, discounts and secure payment gateway integration.\n- Built a React.js admin panel for cruise listings, pricing, discounts and booking management.\n- Designed and integrated Node.js backend APIs for booking operations and admin controls."
+        },
+        "education.txt": {
+          "type": "file",
+          "content": "# Education\n\nGoa College of Engineering\nBachelor of Engineering (Information Technology), 2019 - 2023"
+        }
+      }
+    },
+    "etc": {
+      "type": "dir",
+      "children": {
+        "skills.cfg": {
+          "type": "exe",
+          "app": "control-panel"
+        }
+      }
+    },
+    "games": {
+      "type": "dir",
+      "children": {}
+    },
+    ".trash": {
+      "type": "dir",
+      "children": {
+        "old-projects": {
+          "type": "dir",
+          "children": {}
+        }
+      }
+    }
+  }
+}

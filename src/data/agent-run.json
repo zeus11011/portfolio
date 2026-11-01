@@ -1,0 +1,24 @@
+{
+  "sample": true,
+  "workflow_name": "checkout smoke test (sample)",
+  "status": "passed",
+  "started_at": "2026-07-15T21:54:39.000Z",
+  "finished_at": "2026-07-15T21:54:46.200Z",
+  "duration_ms": 7200,
+  "steps": [
+    { "name": "launchBrowser", "step_type": "action", "status": "passed", "started_at": "2026-07-15T21:54:39.000Z", "finished_at": "2026-07-15T21:54:40.100Z", "duration_ms": 1100, "error": null, "retries": 0 },
+    { "name": "navigate https://shop.example.com", "step_type": "action", "status": "passed", "started_at": "2026-07-15T21:54:40.100Z", "finished_at": "2026-07-15T21:54:41.500Z", "duration_ms": 1400, "error": null, "retries": 0 },
+    { "name": "click 'Add to cart'", "step_type": "action", "status": "passed", "started_at": "2026-07-15T21:54:41.500Z", "finished_at": "2026-07-15T21:54:43.000Z", "duration_ms": 1500, "error": null, "retries": 1 },
+    { "name": "click 'Checkout'", "step_type": "action", "status": "passed", "started_at": "2026-07-15T21:54:43.000Z", "finished_at": "2026-07-15T21:54:44.200Z", "duration_ms": 1200, "error": null, "retries": 0 },
+    { "name": "assert title contains 'Checkout'", "step_type": "assertion", "status": "passed", "started_at": "2026-07-15T21:54:44.200Z", "finished_at": "2026-07-15T21:54:44.300Z", "duration_ms": 100, "error": null, "retries": 0 },
+    { "name": "closeBrowser", "step_type": "action", "status": "passed", "started_at": "2026-07-15T21:54:44.300Z", "finished_at": "2026-07-15T21:54:46.200Z", "duration_ms": 1900, "error": null, "retries": 0 }
+  ],
+  "healing_events": [
+    { "step_name": "click 'Add to cart'", "original_selector": "#add-to-cart", "healed_selector": "button[data-test=add]", "strategy": "text+role", "confidence": 0.92, "timestamp": "2026-07-15T21:54:42.600Z" }
+  ],
+  "total_steps": 6,
+  "passed_steps": 6,
+  "failed_steps": 0,
+  "skipped_steps": 0,
+  "error": null
+}

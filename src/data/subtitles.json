@@ -1,0 +1,12 @@
+{
+  "sample": true,
+  "media": "",
+  "language": "en",
+  "captions": [
+    { "start": 0.5, "end": 3.5, "text": "This is a sample caption track for the live subtitles demo." },
+    { "start": 3.8, "end": 7.0, "text": "Replace it with captions recorded from a real clip." },
+    { "start": 7.3, "end": 10.5, "text": "Audio goes in, Whisper turns speech into text," },
+    { "start": 10.6, "end": 13.5, "text": "NLLB can translate it, and the overlay shows it live." },
+    { "start": 13.8, "end": 16.5, "text": "Put the clip in public/ and set \"media\" to its path." }
+  ]
+}

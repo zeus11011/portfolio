@@ -1,0 +1,13 @@
+[
+  { "name": "python", "level": 4 },
+  { "name": "aws", "level": 4 },
+  { "name": "ci-cd", "level": 4 },
+  { "name": "react", "level": 4 },
+  { "name": "typescript", "level": 3 },
+  { "name": "node", "level": 3 },
+  { "name": "docker", "level": 3 },
+  { "name": "llm-agents", "level": 3 },
+  { "name": "rag", "level": 3 },
+  { "name": "selenium", "level": 3 },
+  { "name": "rust", "level": 2 }
+]
