@@ -51,7 +51,7 @@ export function Boot() {
   }, []);
 
   return (
-    <div className="boot fixed inset-0 z-40 bg-background p-8 text-2xl whitespace-pre-wrap">
+    <div className="boot fixed inset-0 z-40 bg-background p-4 text-lg whitespace-pre-wrap sm:p-8 sm:text-2xl">
       {LINES.slice(0, n).join("\n")}
       <span className="cursor" />
       <p className="absolute bottom-8 text-dim">press any key to skip</p>

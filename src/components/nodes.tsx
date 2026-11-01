@@ -28,6 +28,8 @@ export function IconNode({ data, positionAbsoluteX: x, positionAbsoluteY: y }: P
     <button
       className="flex w-24 flex-col items-center gap-1 p-1 text-center text-xl leading-none hover:bg-foreground/10"
       onDoubleClick={() => open(data.path, { x, y })}
+      // touch screens have no double-click: one tap opens
+      onClick={() => matchMedia("(pointer: coarse)").matches && open(data.path, { x, y })}
       onKeyDown={(e) => e.key === "Enter" && open(data.path, { x, y })}
     >
       <span aria-hidden className="text-4xl">{data.glyph ?? (node ? GLYPH[node.type] : "?")}</span>
@@ -60,7 +62,7 @@ export function WindowNode({ id, data, positionAbsoluteX: x, positionAbsoluteY: 
 
   const wide = project || (node && WIDE.has(node.type === "exe" ? node.app : node.type));
   return (
-    <div className={`${wide ? "w-[680px]" : "w-[480px]"} text-xl`}>
+    <div className={`${wide ? "w-[min(680px,calc(100vw-16px))]" : "w-[min(480px,calc(100vw-16px))]"} text-xl`}>
       <Window title={`~/${data.path}`} onClose={() => close(id)}>
         <div className="nodrag nowheel max-h-[70vh] cursor-text overflow-auto select-text">{body}</div>
       </Window>

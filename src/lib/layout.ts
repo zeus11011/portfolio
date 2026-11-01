@@ -11,7 +11,7 @@ const icon = (id: string, path: string, label: string, x: number, y: number, gly
   data: { path, label, glyph },
 });
 
-export const defaultNodes: Node[] = [
+const desktop: Node[] = [
   icon("resume", "resume.pdf", "Resume.pdf", 40, 40),
   icon("about", "about.txt", "About Me.txt", 160, 40),
   icon("projects", "projects", "Projects", 40, 160),
@@ -32,6 +32,18 @@ export const defaultNodes: Node[] = [
   { id: "terminal", type: "terminal", position: { x: 640, y: 180 }, dragHandle: ".window-title", data: {} },
 ];
 
+/** Desktop layout on wide screens; on phones/tablets the icons reflow into a grid with the terminal below. */
+export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWidth): Node[] {
+  if (w >= 1200) return desktop;
+  const cols = Math.max(1, Math.floor((w - 20) / 120));
+  const icons = desktop.filter((n) => n.type === "icon");
+  const rows = Math.ceil(icons.length / cols);
+  return [
+    ...icons.map((n, i) => ({ ...n, position: { x: 20 + (i % cols) * 120, y: 20 + Math.floor(i / cols) * 120 } })),
+    { ...desktop.find((n) => n.id === "terminal")!, position: { x: 8, y: 20 + rows * 120 } },
+  ];
+}
+
 type Layout = {
   nodes: Node[];
   onNodesChange: (changes: NodeChange[]) => void;
@@ -43,7 +55,7 @@ type Layout = {
 export const useLayout = create<Layout>()(
   persist(
     (set, get) => ({
-      nodes: defaultNodes,
+      nodes: desktop, // SSR markup; Canvas resets to the screen-sized default on first visit
       onNodesChange: (changes) => set({ nodes: applyNodeChanges(changes, get().nodes) }),
       open: (path, near) => {
         const node = resolve(path);
@@ -65,7 +77,7 @@ export const useLayout = create<Layout>()(
         });
       },
       close: (id) => set({ nodes: get().nodes.filter((n) => n.id !== id) }),
-      reset: () => set({ nodes: defaultNodes }),
+      reset: () => set({ nodes: defaultNodes() }),
     }),
     // rehydrated in Canvas after mount so SSR markup matches
     {
@@ -73,7 +85,7 @@ export const useLayout = create<Layout>()(
       version: 7,
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes }),
-      migrate: () => ({ nodes: defaultNodes }), // old saved layouts: start fresh
+      migrate: () => ({ nodes: defaultNodes() }), // old saved layouts: start fresh
     },
   ),
 );

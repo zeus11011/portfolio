@@ -22,8 +22,13 @@ export function Canvas() {
   const bounds: [[number, number], [number, number]] = [[0, 0], [w, h]];
 
   useEffect(() => {
-    useLayout.persist.rehydrate();
-  }, []);
+    let saved = null;
+    try {
+      saved = localStorage.getItem("layout");
+    } catch {}
+    if (saved) useLayout.persist.rehydrate();
+    else reset(); // first visit: lay out for this screen size
+  }, [reset]);
 
   return (
     <ReactFlow
