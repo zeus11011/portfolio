@@ -37,6 +37,12 @@ export const defaultNodes: Node[] = [
     data: { path: "projects/rag-engine", title: "rag-engine", blurb: "Ask questions about your documents, with sources." },
   },
   {
+    id: "card-chip8",
+    type: "card",
+    position: { x: 320, y: 580 },
+    data: { path: "projects/chip-8-emulator", title: "chip-8-emulator", blurb: "A CHIP-8 emulator written in Rust." },
+  },
+  {
     id: "note",
     type: "note",
     position: { x: 640, y: 40 },
@@ -83,7 +89,7 @@ export const useLayout = create<Layout>()(
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 4,
+      version: 5,
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes }),
       migrate: () => ({ nodes: defaultNodes }), // old saved layouts: start fresh

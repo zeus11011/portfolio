@@ -62,3 +62,12 @@ test("rag-engine card opens its folder and README", async ({ page }) => {
   await folder.getByRole("button", { name: "README.md" }).click();
   await expect(page.getByRole("dialog", { name: "~/projects/rag-engine/README.md" }).getByRole("heading", { name: "rag-engine" })).toBeVisible();
 });
+
+test("chip-8 card opens its folder", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /\[ chip-8-emulator \]/ }).dblclick();
+  const folder = page.getByRole("dialog", { name: "~/projects/chip-8-emulator" });
+  await expect(folder.getByRole("button", { name: "github.url" })).toBeVisible();
+  await folder.getByRole("button", { name: "README.md" }).click();
+  await expect(page.getByRole("dialog", { name: "~/projects/chip-8-emulator/README.md" })).toContainText("macroquad");
+});

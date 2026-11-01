@@ -79,7 +79,7 @@ test.describe("shell", () => {
     await expect(input).toHaveValue("cd projects/");
     await input.press("Tab");
     await expect(input).toHaveValue("cd projects/");
-    await expect(term(page)).toContainText("live-subtitles/  browser-testing-agent/  rag-engine/  more/");
+    await expect(term(page)).toContainText("live-subtitles/  browser-testing-agent/  rag-engine/  chip-8-emulator/  more/");
 
     await input.fill("cat projects/live-subtitles/R");
     await input.press("Tab");

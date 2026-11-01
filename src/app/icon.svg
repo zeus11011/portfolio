@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- CRT screen: dark glass with a phosphor bezel -->
+  <rect x="1.5" y="1.5" width="29" height="29" rx="6" fill="#0a0a0a" stroke="#1f9e44" stroke-width="3"/>
+  <!-- ">" prompt -->
+  <path d="M8 9.5l6 6.5-6 6.5" fill="none" stroke="#33ff66" stroke-width="3.5" stroke-linecap="square"/>
+  <!-- "_" block cursor -->
+  <rect x="16" y="19" width="9" height="4" fill="#33ff66"/>
+</svg>

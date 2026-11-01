@@ -67,25 +67,25 @@
             }
           }
         },
+        "chip-8-emulator": {
+          "type": "dir",
+          "children": {
+            "README.md": {
+              "type": "file",
+              "content": "# CHIP-8 Emulator\n\nA CHIP-8 emulator written in Rust: load a ROM and play it in a window.\n\n## How it works\n- CPU instruction decoding and opcode execution.\n- Memory management.\n- Real-time timers and display buffer rendering.\n- Split into `cpu`, `display` and `keyboard` modules; the CPU is unit-tested with mocks.\n\n## Stack\nRust, chosen for speed and strong type safety to keep the emulator efficient and stable. macroquad for the window and rendering, argh for the CLI, mockall for tests.\n\n## Run\n```\ncargo build -r\n./target/release/chip_8_emu -f <rom>\n```"
+            },
+            "github.url": {
+              "type": "url",
+              "href": "https://github.com/zeus11011/chip_8_emu"
+            }
+          }
+        },
         "more": {
           "type": "dir",
           "children": {
             "README.md": {
               "type": "file",
-              "content": "# More projects\n\n- chip-8-emulator: CHIP-8 emulator in Rust"
-            },
-            "chip-8-emulator": {
-              "type": "dir",
-              "children": {
-                "README.md": {
-                  "type": "file",
-                  "content": "# CHIP-8 Emulator\n\nA CHIP-8 emulator written in Rust.\n\n## How it works\n- CPU instruction decoding and opcode execution.\n- Memory management.\n- Real-time timers and display buffer rendering.\n\n## Stack\nRust, chosen for speed and strong type safety to keep the emulator efficient and stable."
-                },
-                "github.url": {
-                  "type": "url",
-                  "href": "https://github.com/zeus11011/chip_8_emu"
-                }
-              }
+              "content": "# More projects\n\nTODO: smaller projects, one README each."
             }
           }
         }

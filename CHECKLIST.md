@@ -47,6 +47,7 @@ Tracks every item from [PROJECT.md](PROJECT.md). Tick `[x]` as things get done.
   - [ ] `projects/live-subtitles/README.md` + real `github.url`
   - [ ] `projects/browser-testing-agent/README.md` + real `github.url`
   - [x] `projects/rag-engine/README.md` + `github.url` (+ desktop card)
+  - [x] `projects/chip-8-emulator/README.md` + `github.url` (+ desktop card)
   - [ ] `projects/more/` (one README each)
   - [ ] `experience/current-company.txt`
   - [ ] `experience/education.txt`
