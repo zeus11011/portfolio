@@ -54,20 +54,22 @@ test(".url opens a new tab", async ({ page, context }) => {
   expect((await popup).url()).toContain("github.com");
 });
 
-test("rag-engine card opens its folder and README", async ({ page }) => {
+test("projects are desktop apps: README plus launch buttons", async ({ page, context }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: /\[ rag-engine \]/ }).dblclick();
-  const folder = page.getByRole("dialog", { name: "~/projects/rag-engine" });
-  await expect(folder.getByRole("button", { name: "github.url" })).toBeVisible();
-  await folder.getByRole("button", { name: "README.md" }).click();
-  await expect(page.getByRole("dialog", { name: "~/projects/rag-engine/README.md" }).getByRole("heading", { name: "rag-engine" })).toBeVisible();
-});
+  for (const [label, path, heading] of [
+    ["RAG Engine", "projects/rag-engine", "rag-engine"],
+    ["CHIP-8", "projects/chip-8-emulator", "CHIP-8 Emulator"],
+  ]) {
+    await page.getByRole("button", { name: label, exact: true }).dblclick();
+    const app = page.getByRole("dialog", { name: `~/${path}` });
+    await expect(app.getByRole("heading", { name: heading })).toBeVisible();
+    const popup = context.waitForEvent("page");
+    await app.getByRole("button", { name: "↗ github" }).click();
+    expect((await popup).url()).toContain("github.com");
+    await app.getByRole("button", { name: `Close ~/${path}` }).click();
+  }
 
-test("chip-8 card opens its folder", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: /\[ chip-8-emulator \]/ }).dblclick();
-  const folder = page.getByRole("dialog", { name: "~/projects/chip-8-emulator" });
-  await expect(folder.getByRole("button", { name: "github.url" })).toBeVisible();
-  await folder.getByRole("button", { name: "README.md" }).click();
-  await expect(page.getByRole("dialog", { name: "~/projects/chip-8-emulator/README.md" })).toContainText("macroquad");
+  await page.getByRole("button", { name: "Live Subtitles", exact: true }).dblclick();
+  await page.getByRole("dialog", { name: "~/projects/live-subtitles" }).getByRole("button", { name: "▶ run demo" }).click();
+  await expect(page.getByRole("dialog", { name: "~/projects/live-subtitles/demo" })).toBeVisible();
 });

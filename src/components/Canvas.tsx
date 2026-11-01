@@ -5,11 +5,11 @@ import "@xyflow/react/dist/base.css";
 import { useEffect, useSyncExternalStore } from "react";
 import { useLayout } from "@/lib/layout";
 import { syncHum } from "@/lib/sound";
-import { CardNode, IconNode, NoteNode, WindowNode } from "./nodes";
+import { IconNode, NoteNode, WindowNode } from "./nodes";
 import { TerminalNode } from "./Terminal";
 import { TrayToggle } from "./TrayToggle";
 
-const nodeTypes = { icon: IconNode, card: CardNode, note: NoteNode, window: WindowNode, terminal: TerminalNode };
+const nodeTypes = { icon: IconNode, note: NoteNode, window: WindowNode, terminal: TerminalNode };
 
 // Screen size as "WxH" so the snapshot is a stable primitive.
 const onResize = (cb: () => void) => (addEventListener("resize", cb), () => removeEventListener("resize", cb));

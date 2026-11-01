@@ -4,11 +4,11 @@ import { persist } from "zustand/middleware";
 import { resolve } from "./fs";
 import { relay } from "./sound";
 
-const icon = (id: string, path: string, label: string, x: number, y: number): Node => ({
+const icon = (id: string, path: string, label: string, x: number, y: number, glyph?: string): Node => ({
   id,
   type: "icon",
   position: { x, y },
-  data: { path, label },
+  data: { path, label, glyph },
 });
 
 export const defaultNodes: Node[] = [
@@ -18,30 +18,11 @@ export const defaultNodes: Node[] = [
   icon("contact", "contact.sh", "Contact", 160, 160),
   icon("ask", "ask-me", "Ask Me (AI)", 40, 280),
   icon("trash", ".trash", "Recycle Bin", 160, 280),
-  {
-    id: "card-subs",
-    type: "card",
-    position: { x: 320, y: 40 },
-    data: { path: "projects/live-subtitles", title: "live-subtitles", blurb: "Real-time captions for audio and video." },
-  },
-  {
-    id: "card-agent",
-    type: "card",
-    position: { x: 320, y: 220 },
-    data: { path: "projects/browser-testing-agent", title: "browser-testing-agent", blurb: "An agent that tests web apps in a real browser." },
-  },
-  {
-    id: "card-rag",
-    type: "card",
-    position: { x: 320, y: 400 },
-    data: { path: "projects/rag-engine", title: "rag-engine", blurb: "Ask questions about your documents, with sources." },
-  },
-  {
-    id: "card-chip8",
-    type: "card",
-    position: { x: 320, y: 580 },
-    data: { path: "projects/chip-8-emulator", title: "chip-8-emulator", blurb: "A CHIP-8 emulator written in Rust." },
-  },
+  // projects as apps
+  icon("app-subs", "projects/live-subtitles", "Live Subtitles", 320, 40, "[cc]"),
+  icon("app-agent", "projects/browser-testing-agent", "Test Agent", 440, 40, "[>]"),
+  icon("app-rag", "projects/rag-engine", "RAG Engine", 320, 160, "[?]"),
+  icon("app-chip8", "projects/chip-8-emulator", "CHIP-8", 440, 160, "[8]"),
   {
     id: "note",
     type: "note",
@@ -89,7 +70,7 @@ export const useLayout = create<Layout>()(
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 5,
+      version: 6,
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes }),
       migrate: () => ({ nodes: defaultNodes }), // old saved layouts: start fresh

@@ -32,7 +32,8 @@ Tracks every item from [PROJECT.md](PROJECT.md). Tick `[x]` as things get done.
 ## 3. Canvas and file system
 
 - [x] Canvas fixed to the browser screen (no pan/zoom, no page overflow; nodes clamped inside, follows window resize)
-- [x] Windows, icons, project cards, sticky notes as custom React Flow nodes (edges/handles hidden)
+- [x] Windows, icons, project apps, sticky notes as custom React Flow nodes (edges/handles hidden)
+- [x] Projects are desktop apps (`[cc]` `[>]` `[?]` `[8]`): open to launch buttons (run demo, github) + README
 - [x] Windows drag by title-bar `dragHandle`
 - [x] `nodrag` / `nowheel` on inputs, buttons, scroll areas
 - [x] Snap-to-grid (20px)
@@ -46,8 +47,8 @@ Tracks every item from [PROJECT.md](PROJECT.md). Tick `[x]` as things get done.
   - [x] `public/resume.pdf` file added
   - [ ] `projects/live-subtitles/README.md` + real `github.url`
   - [ ] `projects/browser-testing-agent/README.md` + real `github.url`
-  - [x] `projects/rag-engine/README.md` + `github.url` (+ desktop card)
-  - [x] `projects/chip-8-emulator/README.md` + `github.url` (+ desktop card)
+  - [x] `projects/rag-engine/README.md` + `github.url` (+ desktop app)
+  - [x] `projects/chip-8-emulator/README.md` + `github.url` (+ desktop app)
   - [ ] `projects/more/` (one README each)
   - [ ] `experience/current-company.txt`
   - [ ] `experience/education.txt`
