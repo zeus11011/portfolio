@@ -27,20 +27,22 @@ const Row = ({ k, children }: { k: string; children: React.ReactNode }) => (
 /** neofetch-style facts (lib/me.ts): who, where, what's loaded, status. */
 function SystemPanel() {
   const { facts, modules, status } = neofetch();
+  let i = 0;
+  const at = () => ({ "--i": i++ }) as React.CSSProperties; // print order, see .nf in globals.css
   return (
-    <section aria-label="system info" className="mt-4 w-[54ch] text-left text-xl leading-tight">
+    <section aria-label="system info" className="nf mt-4 w-[54ch] text-left text-xl leading-tight">
       <p>
-        guest@anish<span className={label}>:~$</span> neofetch
+        guest@anish<span className={label}>:~$</span> <span className="nf-cmd">neofetch</span>
       </p>
-      <hr className="my-1 border-dim" />
+      <hr style={at()} className="my-1 border-dim" />
       {facts.map(([k, v]) => (
-        <Row key={k} k={k}>
-          {v}
-        </Row>
+        <div key={k} style={at()}>
+          <Row k={k}>{v}</Row>
+        </div>
       ))}
-      <p className={`mt-2 ${label}`}>loaded modules</p>
-      <p>{modules}</p>
-      <p className="mt-2">
+      <p style={at()} className={`mt-2 ${label}`}>loaded modules</p>
+      <p style={at()}>{modules}</p>
+      <p style={at()} className="mt-2">
         <span className={label}>status:</span> <span className="bg-foreground px-[1ch] text-background text-shadow-none">{status[0]}</span> {status[1]}
       </p>
     </section>

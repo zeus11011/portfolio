@@ -147,8 +147,34 @@ html[data-booted] .boot {
   100% { transform: scale(1, 1); filter: brightness(1); }
 }
 
+/* Desktop neofetch: types the command, then prints rows one by one (Banner.tsx sets --i). Waits for boot. */
+.nf-cmd {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+.nf [style*="--i"] {
+  animation: nf-print 1ms calc(700ms + var(--i) * 90ms) both;
+}
+html[data-booted] .nf-cmd {
+  animation: nf-type 500ms 200ms steps(8) both;
+}
+html:not([data-booted]) .nf-cmd,
+html:not([data-booted]) .nf [style*="--i"] {
+  animation-play-state: paused;
+  visibility: hidden;
+}
+@keyframes nf-type {
+  from { width: 0; }
+  to { width: 8ch; }
+}
+@keyframes nf-print {
+  from { visibility: hidden; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .crt-overlay, .cursor, .power-on {
+  .crt-overlay, .cursor, .power-on, .nf-cmd, .nf [style*="--i"] {
     animation: none;
   }
 }
