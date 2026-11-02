@@ -1,4 +1,5 @@
 import { join, normalize, resolve } from "./fs";
+import { neofetch } from "./me";
 
 /** A line of output: plain text or a clickable name that opens a path. */
 export type Seg = string | { text: string; path: string };
@@ -15,13 +16,14 @@ export const HELP: Line[] = [
   ["  cat <file>        print a file"],
   ["  open <name>       open a file or app (open resume)"],
   ["  whoami            who's here"],
+  ["  neofetch          system info: role, stack, status"],
   ["  contact           get in touch"],
   ["  crt on/off        screen effects"],
   ["  reset             reset the desktop layout"],
   ["  clear             clear the screen"],
 ];
 
-const COMMANDS = ["cat", "cd", "clear", "contact", "crt", "help", "ls", "open", "reset", "sudo", "whoami"];
+const COMMANDS = ["cat", "cd", "clear", "contact", "crt", "help", "ls", "neofetch", "open", "reset", "sudo", "whoami"];
 
 /**
  * Tab completion. Completes the command name, then the last argument as a path.
@@ -98,6 +100,14 @@ export function run(input: string, state: ShellState): Result {
       return { out: [], state, effect: { clear: true } };
     case "whoami":
       return say("guest", "you're browsing Anish Naik's portfolio. try `cat about.txt` or `open resume`.");
+    case "neofetch": {
+      const { facts, modules, status } = neofetch();
+      const row = ([k, v]: readonly [string, string]): Line => [`${k.padEnd(12)}${v}`];
+      return {
+        out: [["guest@anish"], ["-----------"], ...facts.map(row), [""], ["loaded modules"], [modules], [""], [`status: [${status[0]}] ${status[1]}`]],
+        state,
+      };
+    }
     case "contact":
       return { out: [["opening contact..."]], state, effect: { open: "contact.sh" } };
     case "reset":

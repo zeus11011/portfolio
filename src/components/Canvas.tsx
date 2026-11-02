@@ -4,6 +4,7 @@ import { Background, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { useEffect, useSyncExternalStore } from "react";
 import { useLayout } from "@/lib/layout";
+import { Banner } from "./Banner";
 import { IconNode, NoteNode, WindowNode } from "./nodes";
 import { TerminalNode } from "./Terminal";
 import { TopBar } from "./TopBar";
@@ -42,8 +43,11 @@ export function Canvas() {
   return (
     <div className="flex h-full flex-col">
       <TopBar />
-      <div className="min-h-0 flex-1">
+      {/* desktop color lives here (xyflow's dark default) so the flow can be transparent over the banner */}
+      <div className="relative min-h-0 flex-1 bg-[#141414]">
+        <Banner />
         <ReactFlow
+          style={{ "--xy-background-color": "transparent" } as React.CSSProperties}
           nodes={nodes}
           onNodesChange={onNodesChange}
           nodeTypes={nodeTypes}

@@ -46,6 +46,30 @@ test("window drags by title bar, layout persists, reset restores it", async ({ p
   await expect(win).toBeHidden();
 });
 
+test("windows resize from the corner, and the size persists", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "About Me.txt" }).click();
+  const node = page.locator('.react-flow__node[data-id="win:about.txt"]');
+  await expect(node.getByRole("heading", { name: "Anish Naik" })).toBeVisible();
+  await page.waitForTimeout(400); // power-on animation
+  const before = (await node.boundingBox())!;
+  await page.mouse.move(before.x + before.width - 2, before.y + before.height - 2);
+  await page.mouse.down();
+  await page.mouse.move(before.x + before.width + 200, before.y + before.height + 150, { steps: 8 });
+  await page.mouse.up();
+  const after = (await node.boundingBox())!;
+  expect(after.width).toBeGreaterThan(before.width + 150);
+  expect(after.height).toBeGreaterThan(before.height + 100);
+  // the frame follows the new size: bottom border sits at the node's bottom
+  const frame = (await node.getByRole("dialog").boundingBox())!;
+  expect(Math.abs(frame.y + frame.height - (after.y + after.height))).toBeLessThan(4);
+
+  await page.reload();
+  await expect(node).toBeVisible();
+  expect(Math.abs((await node.boundingBox())!.width - after.width)).toBeLessThan(2);
+});
+
 test(".url opens a new tab", async ({ page, context }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Projects" }).dblclick();
@@ -102,17 +126,31 @@ test("top bar Activities menu opens any desktop app", async ({ page }) => {
 });
 
 for (const [w, h] of [[1280, 600], [1280, 720], [1920, 1080], [390, 844]])
-  test(`${w}x${h}: a README window opens near the click and fits on screen`, async ({ page }) => {
+  test(`${w}x${h}: a README window opens in the middle, on screen, off the icons and terminal`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
     await page.goto("/");
-    const icon = page.getByRole("button", { name: "Test Agent", exact: true });
-    const i = (await icon.boundingBox())!;
-    await icon.click();
-    const win = page.getByRole("dialog", { name: "~/projects/browser-testing-agent" });
-    await expect(win).toBeVisible();
+    await page.getByRole("button", { name: "Test Agent", exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "~/projects/browser-testing-agent" })).toBeVisible();
     const b = (await page.locator('.react-flow__node[data-id="win:projects/browser-testing-agent"]').boundingBox())!;
     expect(b.y + b.height).toBeLessThanOrEqual(h);
     expect(b.x + b.width).toBeLessThanOrEqual(w);
-    if (w >= 700) expect(Math.abs(b.x - (i.x + i.width / 2))).toBeLessThan(80); // phones: windows are full-width
-    expect(Math.abs(b.y - (i.y + i.height / 2))).toBeLessThan(80);
+    if (w < 1200) return; // phones have no free space beside the icons
+    const others = await page.locator(".react-flow__node-icon, .react-flow__node-terminal, .react-flow__node-note").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().toJSON()));
+    for (const o of others) expect(b.x >= o.x + o.width || b.y >= o.y + o.height).toBe(true);
+    // wide enough for the middle to hold it: the name panel stays uncovered too
+    const panel = (await page.getByRole("region", { name: "system info" }).boundingBox())!;
+    if (w >= 1920) expect(b.x + b.width).toBeLessThanOrEqual(panel.x);
   });
+
+test("wide screens: the agent replay auto-plays in the middle, on screen", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto("/");
+  const replay = page.getByRole("dialog", { name: "~/projects/browser-testing-agent/replay" });
+  await expect(replay).toContainText("browser-auto run");
+  const b = (await page.locator('.react-flow__node[data-id="win:projects/browser-testing-agent/replay"]').boundingBox())!;
+  const panel = (await page.getByRole("region", { name: "system info" }).boundingBox())!;
+  const term = (await page.locator(".react-flow__node-terminal").boundingBox())!;
+  expect(b.x).toBeGreaterThanOrEqual(term.x + term.width);
+  expect(b.x + b.width).toBeLessThanOrEqual(panel.x);
+  expect(b.y + b.height).toBeLessThanOrEqual(1080);
+});

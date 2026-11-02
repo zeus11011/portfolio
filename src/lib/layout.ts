@@ -39,9 +39,24 @@ const columns = (w: number) => Math.max(1, Math.floor((w - grid(w).x0) / grid(w)
 /** Which default layout fits this width; a saved layout made for another mode is redone. */
 const layoutMode = (w: number) => (w >= 1200 ? "desktop" : `grid-${columns(w)}x${grid(w).rh}`);
 
-/** Desktop layout on wide screens; on phones/tablets the icons reflow into a grid with the terminal below. */
-export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWidth): Node[] {
-  if (w >= 1200) return desktop;
+/**
+ * Desktop thirds: icons + terminal on the left (ends ~545px with the note), name banner + system panel on the right
+ * (Banner.tsx, ~510px + margin), the middle for windows and proof of work.
+ * ponytail: fixed edges, so a dragged icon/note isn't accounted for; measure the nodes if that matters.
+ */
+const middle = (w: number) => ({ left: 560, right: w - 530 });
+const REPLAY = "projects/browser-testing-agent/replay";
+
+/** Desktop layout on wide screens (plus the agent replay, auto-playing in the middle, when it fits);
+ * on phones/tablets the icons reflow into a grid with the terminal below. */
+export function defaultNodes(w = typeof window === "undefined" ? 1280 : innerWidth, h = typeof window === "undefined" ? 800 : innerHeight): Node[] {
+  if (w >= 1200) {
+    const { left, right } = middle(w);
+    if (right - left < 700) return desktop;
+    // 680 = wide window, 420 = its height (h-72 log + buttons + borders) plus margin; 32 = top bar
+    const replay: Node = { id: `win:${REPLAY}`, type: "window", position: { x: left + (right - left - 680) / 2, y: Math.max(20, h - 32 - 420) }, dragHandle: ".window-title", data: { path: REPLAY } };
+    return [...desktop, replay];
+  }
   const { x0, cw, rh } = grid(w);
   const cols = columns(w);
   const icons = desktop.filter((n) => n.type === "icon");
@@ -69,18 +84,18 @@ export function freeSpot(node: Node, nodes: Node[], w: number, h: number): XYPos
   return spots.sort((a, b) => d(a) - d(b)).find((p) => free(p.x, p.y)) ?? node.position;
 }
 
-// Last click/tap on screen; every open() (icon, menu, terminal link, app button) follows one.
-let click = { x: 20, y: 52 };
-if (typeof window !== "undefined") addEventListener("pointerdown", (e) => (click = { x: e.clientX, y: e.clientY }), true);
-
 /**
- * Where a new window opens: at the last click, kept on screen. 700 = widest window + margin,
- * 260 = shortest window (8rem body + borders); the body shrinks to fit below its y. 40 = top bar + margin.
- * Phones are narrower than any window: x goes to the left edge. Flow coords = screen minus the top bar (viewport pinned at 0,0).
+ * Where a new window opens: centered in the middle third, so it covers neither the icons/terminal nor the
+ * name panel. Too narrow for it: start at the middle's left edge and spill over the panel, never the icons.
+ * Each open window shifts the next 30px down-right so they don't stack exactly. `width` = window width + margin.
+ * Phones/tablets have no middle: left edge, cascading down.
  */
-export function spawnAt(width = 700, w = innerWidth, h = innerHeight): XYPosition {
-  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(v, max));
-  return { x: clamp(click.x + 10, 8, w - width), y: clamp(click.y + 10, 40, h - 260) - 32 };
+export function spawnAt(nodes: Node[], width = 700, w = innerWidth): XYPosition {
+  const step = 30 * (nodes.filter((n) => n.type === "window").length % 6);
+  if (w < 1200) return { x: 8, y: 20 + step };
+  const { left, right } = middle(w);
+  const x = right - left >= width ? left + (right - left - width) / 2 : left;
+  return { x: Math.max(8, Math.min(x + step, w - width)), y: 20 + step };
 }
 
 type Layout = {
@@ -101,7 +116,9 @@ export const useLayout = create<Layout>()(
       // screen changed layout mode (phone/tablet/desktop, rotation, devtools device view): re-lay icons, keep open windows
       fit: () => {
         const mode = layoutMode(innerWidth);
-        if (get().mode !== mode) set({ mode, nodes: [...defaultNodes(), ...get().nodes.filter((n) => n.type === "window")] });
+        if (get().mode === mode) return;
+        const fresh = defaultNodes();
+        set({ mode, nodes: [...fresh, ...get().nodes.filter((n) => n.type === "window" && !fresh.some((f) => f.id === n.id))] });
       },
       onNodesChange: (changes) => {
         let nodes = applyNodeChanges(changes, get().nodes);
@@ -126,7 +143,7 @@ export const useLayout = create<Layout>()(
         set({
           nodes: [
             ...nodes,
-            { id, type: "window", position: spawnAt(node.type === "pdf" ? 980 : 700) /* pdf window is 960px wide (nodes.tsx) */, dragHandle: ".window-title", selected: true, data: { path } },
+            { id, type: "window", position: spawnAt(nodes, node.type === "pdf" ? 980 : 700) /* pdf window is 960px wide (nodes.tsx) */, dragHandle: ".window-title", selected: true, data: { path } },
           ],
         });
       },
@@ -136,7 +153,7 @@ export const useLayout = create<Layout>()(
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 9,
+      version: 10, // 10: replay docked in the middle
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes, mode: s.mode }),
       migrate: () => ({ mode: "" }), // old saved layouts: fit() starts fresh

@@ -69,7 +69,8 @@ test("width change reloads the page, height-only change does not", async ({ page
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   await page.evaluate(() => ((window as unknown as { marker: number }).marker = 1));
-  const marker = () => page.evaluate(() => (window as unknown as { marker?: number }).marker);
+  // mid-reload the evaluate throws; report "navigating" so the poll retries instead of failing
+  const marker = () => page.evaluate(() => (window as unknown as { marker?: number }).marker).catch(() => "navigating");
 
   await page.setViewportSize({ width: 1280, height: 600 }); // like a phone keyboard opening
   await page.waitForTimeout(600);

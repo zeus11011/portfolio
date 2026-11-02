@@ -59,6 +59,18 @@ test.describe("shell", () => {
     await expect(term(page)).not.toContainText("whoami");
   });
 
+  test("neofetch prints the same facts as the desktop panel", async ({ page }) => {
+    const input = page.getByLabel("Terminal input");
+    await input.fill("neof");
+    await input.press("Tab"); // completes
+    await expect(input).toHaveValue("neofetch ");
+    await input.press("Enter");
+    await expect(term(page)).toContainText("Software Engineer @ Infuse (useMango)");
+    await expect(term(page)).toContainText(/uptime\s+\d+y \d+m since Aug 2023/);
+    await expect(term(page)).toContainText("python · aws · ci-cd");
+    await expect(term(page)).toContainText("status: [open to work] backend / applied AI");
+  });
+
   test("rm -rf / panics, any key reboots", async ({ page }) => {
     await type(page, "rm -rf /");
     await expect(page.getByText("Kernel panic - not syncing")).toBeVisible();

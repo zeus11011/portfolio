@@ -1,6 +1,6 @@
 "use client";
 
-import type { Node, NodeProps } from "@xyflow/react";
+import { NodeResizer, type Node, type NodeProps } from "@xyflow/react";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -43,6 +43,9 @@ export function NoteNode({ data }: Props<{ text: string }>) {
 }
 
 export function WindowNode({ id, data, positionAbsoluteY: y }: Props<{ path: string }>) {
+  // set once the user resizes (NodeResizer writes node.width/height, persisted with the layout).
+  // Not the width/height props: xyflow fills those from the measured size too.
+  const sized = useLayout((s) => s.nodes.some((n) => n.id === id && n.width !== undefined));
   const close = useLayout((s) => s.close);
   const [cwd, setCwd] = useState(data.path);
   const node = resolve(data.path);
@@ -64,13 +67,16 @@ export function WindowNode({ id, data, positionAbsoluteY: y }: Props<{ path: str
   // READMEs get the wide window so long project titles fit on one line
   const wide = project || name === "README.md" || (node && WIDE.has(node.type === "exe" ? node.app : node.type));
   return (
-    <div className={`${node?.type === "pdf" ? "w-[min(960px,calc(100vw-16px))]" : wide ? "w-[min(680px,calc(100vw-16px))]" : "w-[min(480px,calc(100vw-16px))]"} text-xl max-md:text-2xl`}>
-      <Window title={`~/${cwd}`} onClose={() => close(id)}>
-        {/* fit on screen: viewport minus top bar (32px), window y, and the window's own borders/padding */}
-        <div className="nodrag nowheel cursor-text overflow-auto select-text" style={{ maxHeight: `max(8rem, min(70vh, calc(100dvh - ${y + 32}px - 4lh)))` }}>
+    <div className={`${sized ? "h-full w-full" : node?.type === "pdf" ? "w-[min(960px,calc(100vw-16px))]" : wide ? "w-[min(680px,calc(100vw-16px))]" : "w-[min(480px,calc(100vw-16px))]"} text-xl max-md:text-2xl`}>
+      <Window title={`~/${cwd}`} onClose={() => close(id)} fill={sized}>
+        {/* fit on screen: viewport minus top bar (32px), window y, and the window's own borders/padding. Resized: fill the window. */}
+        <div className="nodrag nowheel cursor-text overflow-auto select-text" style={sized ? { height: "100%" } : { maxHeight: `max(8rem, min(70vh, calc(100dvh - ${y + 32}px - 4lh)))` }}>
           {body}
         </div>
       </Window>
+      {/* invisible grab strips on every edge/corner (styled in globals.css); the ASCII border stays clean.
+          After <Window> so they paint above it (its power-on transform makes it a layer). */}
+      <NodeResizer minWidth={240} minHeight={160} lineClassName="window-resize" handleClassName="window-resize" />
     </div>
   );
 }

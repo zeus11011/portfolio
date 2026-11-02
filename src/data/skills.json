@@ -3,11 +3,19 @@
   { "name": "aws", "level": 4 },
   { "name": "ci-cd", "level": 4 },
   { "name": "react", "level": 4 },
+  { "name": "Next.js", "level": 4 },
   { "name": "typescript", "level": 3 },
   { "name": "node", "level": 3 },
   { "name": "docker", "level": 3 },
   { "name": "llm-agents", "level": 3 },
   { "name": "rag", "level": 3 },
   { "name": "selenium", "level": 3 },
-  { "name": "rust", "level": 2 }
+  { "name": "rust", "level": 2 },
+  { "name": "Agents", "level": 2 },
+  { "name": "Agent-loop", "level": 2 },
+  { "name": "React-Agents", "level": 2 },
+  { "name": "DevOps", "level": 2 },
+  { "name": "Linux", "level": 2 },
+  { "name": "", "level": 2 },
+  { "name": "Express", "level": 4 }
 ]

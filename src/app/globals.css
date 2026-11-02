@@ -102,6 +102,41 @@ html[data-booted] .boot {
   50% { opacity: 0; }
 }
 
+/* Window resize (NodeResizer): invisible 8px grab strips on the edges, 14px corners; cursor shows the direction */
+.react-flow__resize-control.window-resize.line {
+  border-color: transparent;
+}
+.react-flow__resize-control.window-resize.line.left,
+.react-flow__resize-control.window-resize.line.right {
+  width: 8px;
+}
+.react-flow__resize-control.window-resize.line.top,
+.react-flow__resize-control.window-resize.line.bottom {
+  height: 8px;
+}
+.react-flow__resize-control.window-resize.handle {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  background: transparent;
+}
+.react-flow__resize-control.window-resize.left,
+.react-flow__resize-control.window-resize.right {
+  cursor: ew-resize !important;
+}
+.react-flow__resize-control.window-resize.top,
+.react-flow__resize-control.window-resize.bottom {
+  cursor: ns-resize !important;
+}
+.react-flow__resize-control.window-resize.top.left,
+.react-flow__resize-control.window-resize.bottom.right {
+  cursor: nwse-resize !important;
+}
+.react-flow__resize-control.window-resize.top.right,
+.react-flow__resize-control.window-resize.bottom.left {
+  cursor: nesw-resize !important;
+}
+
 /* Window power-on: horizontal line, then expand */
 .power-on {
   animation: power-on 350ms ease-out both;
