@@ -26,7 +26,7 @@ export function Window({
         )}
         <span>─┐</span>
       </div>
-      <div className="grid grid-cols-[1ch_1fr_1ch]">
+      <div className="grid grid-cols-[1ch_minmax(0,1fr)_1ch]">
         <span aria-hidden className="h-0 min-h-full overflow-hidden whitespace-pre">{V}</span>
         <div className="px-[1ch] py-1 leading-tight">{children}</div>
         <span aria-hidden className="h-0 min-h-full overflow-hidden whitespace-pre">{V}</span>

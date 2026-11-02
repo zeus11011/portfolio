@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const term = (page: Page) => page.getByRole("dialog", { name: "guest@anish: ~" });
+const term = (page: Page) => page.getByRole("dialog", { name: "guest@anish:~" });
 async function type(page: Page, cmd: string) {
   const input = page.getByLabel("Terminal input");
   await input.fill(cmd);

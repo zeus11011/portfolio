@@ -5,7 +5,7 @@ test.beforeEach(({ page }) => page.addInitScript(() => sessionStorage.setItem("b
 test("windows and icons can't be dragged off screen, canvas can't be panned away", async ({ page }) => {
   await page.goto("/");
   const vp = page.viewportSize()!;
-  const term = page.getByRole("dialog", { name: "guest@anish: ~" });
+  const term = page.getByRole("dialog", { name: "guest@anish:~" });
   const title = term.locator(".window-title");
   const b = (await title.boundingBox())!;
   await page.mouse.move(b.x + 100, b.y + 5);

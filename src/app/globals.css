@@ -77,19 +77,6 @@ html:not([data-crt="off"]) body {
 html[data-crt="off"] .crt-overlay {
   display: none;
 }
-/* Rolling refresh line */
-.crt-overlay::after {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto;
-  height: 120px;
-  background: linear-gradient(to bottom, transparent, #33ff6612 60%, #33ff6626 95%, transparent);
-  animation: roll 8s linear infinite;
-}
-@keyframes roll {
-  from { transform: translateY(-120px); }
-  to { transform: translateY(100vh); }
-}
 @keyframes flicker {
   0%, 100% { opacity: 1; }
   47% { opacity: 0.94; }
@@ -129,14 +116,12 @@ html[data-booted] .boot {
   .crt-overlay, .cursor, .power-on {
     animation: none;
   }
-  .crt-overlay::after {
-    display: none;
-  }
 }
 
 /* Notepad: markdown in a text window */
-.md h1 { font-size: 1.6em; }
-.md h2 { font-size: 1.3em; margin-top: 0.5em; }
+.md h1 { font-size: 1.3em; }
+.md h2 { font-size: 1.15em; margin-top: 0.5em; }
+.md h1, .md h2 { text-wrap: balance; }
 .md h1::before { content: "# "; color: var(--dim); }
 .md h2::before { content: "## "; color: var(--dim); }
 .md p, .md ul, .md ol { margin: 0.4em 0; }

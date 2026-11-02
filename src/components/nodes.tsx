@@ -2,6 +2,7 @@
 
 import type { Node, NodeProps } from "@xyflow/react";
 import dynamic from "next/dynamic";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { asset, GLYPH, resolve } from "@/lib/fs";
 import { useLayout } from "@/lib/layout";
@@ -21,16 +22,15 @@ const WIDE = new Set(["pdf", "subtitles-demo", "agent-terminal"]);
 
 type Props<T extends Record<string, unknown>> = NodeProps<Node<T>>;
 
-export function IconNode({ data, positionAbsoluteX: x, positionAbsoluteY: y }: Props<{ path: string; label: string; glyph?: string }>) {
+export function IconNode({ data }: Props<{ path: string; label: string; glyph?: string }>) {
   const open = useLayout((s) => s.open);
   const node = resolve(data.path);
   return (
     <button
-      className="flex w-24 flex-col items-center gap-1 p-1 text-center text-xl leading-none max-md:w-28 max-md:text-2xl hover:bg-foreground/10"
-      onDoubleClick={() => open(data.path, { x, y })}
-      // phones/tablets (touch, or narrower than the desktop layout): one click/tap opens
-      onClick={() => (matchMedia("(pointer: coarse)").matches || innerWidth < 1200) && open(data.path, { x, y })}
-      onKeyDown={(e) => e.key === "Enter" && open(data.path, { x, y })}
+      className="flex w-28 flex-col items-center gap-1 p-1 text-center text-xl leading-none max-md:text-2xl hover:bg-foreground/10"
+      // one click/tap opens (a drag is not a click); double-click works too
+      onClick={() => open(data.path)}
+      onKeyDown={(e) => e.key === "Enter" && open(data.path)}
     >
       <span aria-hidden className="text-4xl max-md:text-6xl">{data.glyph ?? (node ? GLYPH[node.type] : "?")}</span>
       <span>{data.label}</span>
@@ -39,11 +39,12 @@ export function IconNode({ data, positionAbsoluteX: x, positionAbsoluteY: y }: P
 }
 
 export function NoteNode({ data }: Props<{ text: string }>) {
-  return <div className="w-48 -rotate-2 bg-foreground p-3 text-xl leading-tight text-background [text-shadow:none]">{data.text}</div>;
+  return <div className="w-40 -rotate-2 bg-foreground p-3 text-xl leading-tight text-background [text-shadow:none]">{data.text}</div>;
 }
 
-export function WindowNode({ id, data, positionAbsoluteX: x, positionAbsoluteY: y }: Props<{ path: string }>) {
+export function WindowNode({ id, data, positionAbsoluteY: y }: Props<{ path: string }>) {
   const close = useLayout((s) => s.close);
+  const [cwd, setCwd] = useState(data.path);
   const node = resolve(data.path);
   const name = data.path.split("/").pop()!;
   const App = node?.type === "exe" ? APPS[node.app] : undefined;
@@ -52,19 +53,23 @@ export function WindowNode({ id, data, positionAbsoluteX: x, positionAbsoluteY: 
   const project = node?.type === "dir" && Object.values(node.children).some((c) => c.type === "exe" || c.type === "url");
 
   let body;
-  if (project) body = <ProjectApp path={data.path} near={{ x, y }} />;
-  else if (node?.type === "dir") body = <Explorer path={data.path} near={{ x, y }} />;
+  if (project) body = <ProjectApp path={data.path} />;
+  else if (node?.type === "dir") body = <Explorer path={data.path} onPath={setCwd} />;
   else if (node?.type === "file") body = <div className="md"><ReactMarkdown>{node.content}</ReactMarkdown></div>;
   else if (node?.type === "pdf") body = <PdfViewer src={asset(node.src)} name={name} />;
   else if (App) body = <App />;
   else if (node?.type === "exe") body = <p>bash: {name}: app not installed yet</p>;
   else body = <p>cat: {data.path}: No such file or directory</p>;
 
-  const wide = project || (node && WIDE.has(node.type === "exe" ? node.app : node.type));
+  // READMEs get the wide window so long project titles fit on one line
+  const wide = project || name === "README.md" || (node && WIDE.has(node.type === "exe" ? node.app : node.type));
   return (
-    <div className={`${wide ? "w-[min(680px,calc(100vw-16px))]" : "w-[min(480px,calc(100vw-16px))]"} text-xl max-md:text-2xl`}>
-      <Window title={`~/${data.path}`} onClose={() => close(id)}>
-        <div className="nodrag nowheel max-h-[70vh] cursor-text overflow-auto select-text">{body}</div>
+    <div className={`${node?.type === "pdf" ? "w-[min(960px,calc(100vw-16px))]" : wide ? "w-[min(680px,calc(100vw-16px))]" : "w-[min(480px,calc(100vw-16px))]"} text-xl max-md:text-2xl`}>
+      <Window title={`~/${cwd}`} onClose={() => close(id)}>
+        {/* fit on screen: viewport minus top bar (32px), window y, and the window's own borders/padding */}
+        <div className="nodrag nowheel cursor-text overflow-auto select-text" style={{ maxHeight: `max(8rem, min(70vh, calc(100dvh - ${y + 32}px - 4lh)))` }}>
+          {body}
+        </div>
       </Window>
     </div>
   );

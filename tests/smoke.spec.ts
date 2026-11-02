@@ -12,6 +12,7 @@ test("crt toggle turns effects off and remembers it", async ({ page }) => {
   await page.goto("/");
   const html = page.locator("html");
   await expect(html).not.toHaveAttribute("data-crt", "off");
+  await page.getByLabel("system menu").click();
   await page.getByRole("button", { name: "crt: on" }).click();
   await expect(html).toHaveAttribute("data-crt", "off");
   await expect(page.locator(".crt-overlay")).toBeHidden();

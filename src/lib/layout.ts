@@ -11,25 +11,26 @@ const icon = (id: string, path: string, label: string, x: number, y: number, gly
   data: { path, label, glyph },
 });
 
+// Left column: 3x3 icons (120px cells), terminal below them.
 const desktop: Node[] = [
-  icon("resume", "resume.pdf", "Resume.pdf", 40, 40),
-  icon("about", "about.txt", "About Me.txt", 160, 40),
-  icon("projects", "projects", "Projects", 40, 160),
-  icon("contact", "contact.sh", "Contact", 160, 160),
-  icon("ask", "ask-me", "Ask Me (AI)", 40, 280),
-  icon("trash", ".trash", "Recycle Bin", 160, 280),
+  icon("resume", "resume.pdf", "Resume.pdf", 20, 20),
+  icon("about", "about.txt", "About Me.txt", 140, 20),
+  icon("projects", "projects", "Projects", 260, 20),
+  icon("contact", "contact.sh", "Contact", 20, 120, "[@]"),
+  icon("ask", "ask-me", "Ask Me (AI)", 140, 120, "[ai]"),
+  icon("trash", ".trash", "Recycle Bin", 260, 120, "\\_/"),
   // projects as apps
-  // hidden for now: icon("app-subs", "projects/.live-subtitles", "Live Subtitles", 320, 40, "[cc]"),
-  icon("app-agent", "projects/browser-testing-agent", "Test Agent", 440, 40, "[>]"),
-  icon("app-rag", "projects/rag-engine", "RAG Engine", 320, 160, "[?]"),
-  icon("app-chip8", "projects/chip-8-emulator", "CHIP-8", 440, 160, "[8]"),
+  // hidden for now: icon("app-subs", "projects/.live-subtitles", "Live Subtitles", ..., "[cc]"),
+  icon("app-agent", "projects/browser-testing-agent", "Test Agent", 20, 220, "[>]"),
+  icon("app-rag", "projects/rag-engine", "RAG Engine", 140, 220, "[?]"),
+  icon("app-chip8", "projects/chip-8-emulator", "CHIP-8", 260, 220, "[8]"),
   {
     id: "note",
     type: "note",
-    position: { x: 640, y: 40 },
+    position: { x: 385, y: 40 },
     data: { text: "drag me. drag windows by their title bar." },
   },
-  { id: "terminal", type: "terminal", position: { x: 640, y: 180 }, dragHandle: ".window-title", data: {} },
+  { id: "terminal", type: "terminal", position: { x: 20, y: 320 }, dragHandle: ".window-title", data: {} },
 ];
 
 /** Grid cells for the reflowed layout. Phones (< 768px, Tailwind's md) get bigger icons (w-28 = 112px): tighter margin, taller rows, 3 columns down to 360px. */
@@ -68,12 +69,26 @@ export function freeSpot(node: Node, nodes: Node[], w: number, h: number): XYPos
   return spots.sort((a, b) => d(a) - d(b)).find((p) => free(p.x, p.y)) ?? node.position;
 }
 
+// Last click/tap on screen; every open() (icon, menu, terminal link, app button) follows one.
+let click = { x: 20, y: 52 };
+if (typeof window !== "undefined") addEventListener("pointerdown", (e) => (click = { x: e.clientX, y: e.clientY }), true);
+
+/**
+ * Where a new window opens: at the last click, kept on screen. 700 = widest window + margin,
+ * 260 = shortest window (8rem body + borders); the body shrinks to fit below its y. 40 = top bar + margin.
+ * Phones are narrower than any window: x goes to the left edge. Flow coords = screen minus the top bar (viewport pinned at 0,0).
+ */
+export function spawnAt(width = 700, w = innerWidth, h = innerHeight): XYPosition {
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(v, max));
+  return { x: clamp(click.x + 10, 8, w - width), y: clamp(click.y + 10, 40, h - 260) - 32 };
+}
+
 type Layout = {
   nodes: Node[];
   mode: string;
   fit: () => void;
   onNodesChange: (changes: NodeChange[]) => void;
-  open: (path: string, near: XYPosition) => void;
+  open: (path: string) => void;
   close: (id: string) => void;
   reset: () => void;
 };
@@ -96,7 +111,7 @@ export const useLayout = create<Layout>()(
             nodes = nodes.map((n) => (n.id === c.id && n.type === "icon" ? { ...n, position: freeSpot(n, nodes, innerWidth, innerHeight) } : n));
         set({ nodes });
       },
-      open: (path, near) => {
+      open: (path) => {
         const node = resolve(path);
         if (!node) return;
         if (node.type === "url") {
@@ -111,7 +126,7 @@ export const useLayout = create<Layout>()(
         set({
           nodes: [
             ...nodes,
-            { id, type: "window", position: { x: near.x + 40, y: near.y + 40 }, dragHandle: ".window-title", selected: true, data: { path } },
+            { id, type: "window", position: spawnAt(node.type === "pdf" ? 980 : 700) /* pdf window is 960px wide (nodes.tsx) */, dragHandle: ".window-title", selected: true, data: { path } },
           ],
         });
       },
@@ -121,7 +136,7 @@ export const useLayout = create<Layout>()(
     // rehydrated in Canvas after mount so SSR markup matches
     {
       name: "layout",
-      version: 8,
+      version: 9,
       skipHydration: true,
       partialize: (s) => ({ nodes: s.nodes, mode: s.mode }),
       migrate: () => ({ mode: "" }), // old saved layouts: fit() starts fresh

@@ -1,13 +1,12 @@
 "use client";
 
-import { Background, Panel, ReactFlow } from "@xyflow/react";
+import { Background, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/base.css";
 import { useEffect, useSyncExternalStore } from "react";
 import { useLayout } from "@/lib/layout";
-import { syncHum } from "@/lib/sound";
 import { IconNode, NoteNode, WindowNode } from "./nodes";
 import { TerminalNode } from "./Terminal";
-import { TrayToggle } from "./TrayToggle";
+import { TopBar } from "./TopBar";
 
 const nodeTypes = { icon: IconNode, note: NoteNode, window: WindowNode, terminal: TerminalNode };
 
@@ -16,10 +15,10 @@ const onResize = (cb: () => void) => (addEventListener("resize", cb), () => remo
 const screenSize = () => `${innerWidth}x${innerHeight}`;
 
 export function Canvas() {
-  const { nodes, onNodesChange, reset, fit } = useLayout();
+  const { nodes, onNodesChange, fit } = useLayout();
   const [w, h] = useSyncExternalStore(onResize, screenSize, () => "1280x800").split("x").map(Number);
-  // keep nodes inside the screen
-  const bounds: [[number, number], [number, number]] = [[0, 0], [w, h]];
+  // keep nodes inside the screen, below the 32px top bar
+  const bounds: [[number, number], [number, number]] = [[0, 0], [w, h - 32]];
 
   useEffect(() => {
     Promise.resolve(useLayout.persist.rehydrate()).then(fit);
@@ -41,33 +40,32 @@ export function Canvas() {
   }, []);
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      onNodesChange={onNodesChange}
-      nodeTypes={nodeTypes}
-      snapToGrid
-      snapGrid={[20, 20]}
-      nodeExtent={bounds}
-      translateExtent={bounds}
-      // the desktop is exactly one screen: no zoom, no pan
-      minZoom={1}
-      maxZoom={1}
-      panOnDrag={false}
-      panOnScroll={false}
-      zoomOnScroll={false}
-      zoomOnPinch={false}
-      zoomOnDoubleClick={false}
-      deleteKeyCode={null}
-      colorMode="dark"
-    >
-      <Background color="var(--dim)" gap={20} size={1} />
-      <Panel position="bottom-left" className="flex gap-4 text-xl text-dim max-md:text-2xl">
-        <button onClick={reset} className="hover:bg-foreground hover:text-background">
-          reset layout
-        </button>
-        <TrayToggle name="crt" defaultOn />
-        <TrayToggle name="sound" defaultOn={false} onChange={syncHum} />
-      </Panel>
-    </ReactFlow>
+    <div className="flex h-full flex-col">
+      <TopBar />
+      <div className="min-h-0 flex-1">
+        <ReactFlow
+          nodes={nodes}
+          onNodesChange={onNodesChange}
+          nodeTypes={nodeTypes}
+          snapToGrid
+          snapGrid={[20, 20]}
+          nodeExtent={bounds}
+          translateExtent={bounds}
+          // the desktop is exactly one screen: no zoom, no pan. Pinned, else the SSR-size extent leaves it centered/offset on big screens
+          viewport={{ x: 0, y: 0, zoom: 1 }}
+          minZoom={1}
+          maxZoom={1}
+          panOnDrag={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          zoomOnDoubleClick={false}
+          deleteKeyCode={null}
+          colorMode="dark"
+        >
+          <Background color="var(--dim)" gap={20} size={1} />
+        </ReactFlow>
+      </div>
+    </div>
   );
 }

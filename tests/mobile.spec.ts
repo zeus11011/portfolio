@@ -18,7 +18,7 @@ for (const [name, viewport] of [
       };
       const icons = page.locator(".react-flow__node-icon");
       for (let i = 0; i < (await icons.count()); i++) await inView(await icons.nth(i).boundingBox());
-      await inView(await page.getByRole("dialog", { name: "guest@anish: ~" }).boundingBox());
+      await inView(await page.getByRole("dialog", { name: "guest@anish:~" }).boundingBox());
 
       await page.getByRole("button", { name: "About Me.txt" }).tap();
       const about = page.getByRole("dialog", { name: "~/about.txt" });
@@ -35,7 +35,7 @@ for (const [name, viewport] of [
       await page.goto("/");
       await page.getByRole("button", { name: "About Me.txt" }).dblclick(); // saves the desktop layout
       await page.setViewportSize(viewport); // like switching devtools to a device
-      const terminal = page.getByRole("dialog", { name: "guest@anish: ~" });
+      const terminal = page.getByRole("dialog", { name: "guest@anish:~" });
       const icon = page.getByRole("button", { name: "CHIP-8" });
       await expect(async () => {
         const t = (await terminal.boundingBox())!;

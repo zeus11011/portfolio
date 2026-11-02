@@ -13,7 +13,7 @@ export const HELP: Line[] = [
   ["  ls [-a] [dir]     list files (click a name to open it)"],
   ["  cd <dir>          change directory"],
   ["  cat <file>        print a file"],
-  ["  open <name>       open a file, folder or app (e.g. open resume)"],
+  ["  open <name>       open a file or app (open resume)"],
   ["  whoami            who's here"],
   ["  contact           get in touch"],
   ["  crt on/off        screen effects"],

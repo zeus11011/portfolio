@@ -14,7 +14,17 @@ export function setFlag(name: string, on: boolean) {
   listeners.forEach((cb) => cb());
 }
 
-export function TrayToggle({ name, defaultOn, onChange }: { name: string; defaultOn: boolean; onChange?: () => void }) {
+export function TrayToggle({
+  name,
+  defaultOn,
+  onChange,
+  className = "hover:bg-foreground hover:text-background",
+}: {
+  name: string;
+  defaultOn: boolean;
+  onChange?: () => void;
+  className?: string;
+}) {
   const on = useSyncExternalStore(
     subscribe,
     () => (document.documentElement.dataset[name] ?? (defaultOn ? "on" : "off")) === "on",
@@ -24,7 +34,7 @@ export function TrayToggle({ name, defaultOn, onChange }: { name: string; defaul
     <button
       onClick={() => (setFlag(name, !on), onChange?.())}
       aria-pressed={on}
-      className="hover:bg-foreground hover:text-background"
+      className={className}
     >
       {name}: {on ? "on" : "off"}
     </button>

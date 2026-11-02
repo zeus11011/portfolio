@@ -1,6 +1,5 @@
 "use client";
 
-import type { XYPosition } from "@xyflow/react";
 import ReactMarkdown from "react-markdown";
 import { join, resolve } from "@/lib/fs";
 import { useLayout } from "@/lib/layout";
@@ -8,7 +7,7 @@ import { useLayout } from "@/lib/layout";
 const btn = "border border-foreground px-2 hover:bg-foreground hover:text-background";
 
 /** A project folder shown as an app: launch buttons for its demo/links, then its README. */
-export default function ProjectApp({ path, near }: { path: string; near: XYPosition }) {
+export default function ProjectApp({ path }: { path: string }) {
   const open = useLayout((s) => s.open);
   const node = resolve(path);
   if (node?.type !== "dir") return null;
@@ -20,7 +19,7 @@ export default function ProjectApp({ path, near }: { path: string; near: XYPosit
       <div className="flex flex-wrap gap-2">
         {entries.map(([name, child]) =>
           child.type === "exe" || child.type === "url" ? (
-            <button key={name} className={btn} onClick={() => open(join(path, name), near)}>
+            <button key={name} className={btn} onClick={() => open(join(path, name))}>
               {child.type === "exe" ? `▶ run ${name}` : `↗ ${name.replace(/\.url$/, "")}`}
             </button>
           ) : null,

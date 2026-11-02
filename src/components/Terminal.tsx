@@ -1,6 +1,5 @@
 "use client";
 
-import type { NodeProps } from "@xyflow/react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLayout } from "@/lib/layout";
@@ -13,7 +12,7 @@ const WELCOME: Line[] = [["welcome to guestOS. type `help` (tab autocompletes), 
 const CHARS_PER_TICK = 6; // every 16ms ≈ 375 chars/s
 const text = (l: Line) => l.map((s) => (typeof s === "string" ? s : s.text)).join("");
 
-export function TerminalNode({ positionAbsoluteX: x, positionAbsoluteY: y }: NodeProps) {
+export function TerminalNode() {
   const { open, reset } = useLayout();
   const [lines, setLines] = useState<Line[]>(WELCOME);
   const [sh, setSh] = useState<ShellState>({ cwd: "" });
@@ -68,7 +67,7 @@ export function TerminalNode({ positionAbsoluteX: x, positionAbsoluteY: y }: Nod
     setHi(-1);
     if (input.trim()) setHistory((h) => [...h, input]);
     const e = r.effect;
-    if (e?.open) open(e.open, { x, y });
+    if (e?.open) open(e.open);
     if (e?.reset) reset();
     if (e?.crt !== undefined) setFlag("crt", e.crt);
     if (e?.panic) setPanic(true);
@@ -95,7 +94,7 @@ export function TerminalNode({ positionAbsoluteX: x, positionAbsoluteY: y }: Nod
 
   return (
     <div className="w-[min(520px,calc(100vw-16px))] text-xl max-md:text-2xl" onClick={() => !getSelection()?.toString() && inputRef.current?.focus()}>
-      <Window title="guest@anish: ~">
+      <Window title="guest@anish:~">
         {/* phones: 3 icon rows (~440px, see grid() in layout.ts) + window chrome + bottom bar take ~34rem; the terminal gets the rest */}
         <div ref={outRef} className="nodrag nowheel h-[min(18rem,35vh)] cursor-text max-md:h-[clamp(6rem,calc(100dvh-34rem),18rem)] overflow-auto select-text">
           {/* screen readers get whole lines here instead of the typewriter */}
@@ -117,7 +116,7 @@ export function TerminalNode({ positionAbsoluteX: x, positionAbsoluteY: y }: Nod
                     return typeof s === "string" ? (
                       shown
                     ) : (
-                      <button key={j} onClick={() => open(s.path, { x, y })} className="underline hover:bg-foreground hover:text-background">
+                      <button key={j} onClick={() => open(s.path)} className="underline hover:bg-foreground hover:text-background">
                         {shown}
                       </button>
                     );
