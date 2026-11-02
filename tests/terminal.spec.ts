@@ -120,4 +120,32 @@ test.describe("shell", () => {
     }
     throw new Error("binary search should win in 7 tries");
   });
+
+  test("ask streams an answer and sends earlier turns as history", async ({ page }) => {
+    const bodies: { question: string; history: unknown[] }[] = [];
+    await page.route("**/api/ask/stream", (route) => {
+      bodies.push(route.request().postDataJSON());
+      const sse = [{ sources: ["profile.md"] }, { token: "**Python**" }, { token: ",\nRust" }, { done: true }];
+      route.fulfill({ contentType: "text/event-stream", body: sse.map((d) => `data: ${JSON.stringify(d)}\n\n`).join("") });
+    });
+    await type(page, "ask top skills?");
+    await expect(term(page)).toContainText("Python,Rust");
+    await type(page, "ask");
+    await expect(term(page)).toContainText("ask>");
+    await type(page, "and more?");
+    await expect.poll(() => bodies.length).toBe(2);
+    expect(bodies[1]).toEqual({ question: "and more?", history: [{ role: "user", content: "top skills?" }, { role: "assistant", content: "**Python**,\nRust" }] });
+    await type(page, "exit");
+    await expect(term(page)).toContainText("guest@anish:~$");
+  });
+
+  test("Ask Me (AI) icon opens a chat window", async ({ page }) => {
+    await page.route("**/api/ask/stream", (route) => route.fulfill({ contentType: "text/event-stream", body: 'data: {"token": "hi there"}\n\n' }));
+    await page.getByRole("button", { name: "Ask Me (AI)" }).click();
+    const win = page.getByRole("dialog", { name: "~/ask-me" });
+    await expect(win).toContainText("ask me anything");
+    await win.getByLabel("Ask input").fill("hello");
+    await win.getByLabel("Ask input").press("Enter");
+    await expect(win).toContainText("hi there");
+  });
 });

@@ -17,6 +17,7 @@ const APPS: Record<string, React.ComponentType> = {
   "subtitles-demo": dynamic(() => import("./apps/SubtitlesDemo")),
   "agent-terminal": dynamic(() => import("./apps/AgentTerminal")),
   "control-panel": dynamic(() => import("./apps/ControlPanel")),
+  "ask-me": dynamic(() => import("./Terminal")),
 };
 const WIDE = new Set(["pdf", "subtitles-demo", "agent-terminal"]);
 

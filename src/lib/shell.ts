@@ -4,13 +4,14 @@ import { neofetch } from "./me";
 /** A line of output: plain text or a clickable name that opens a path. */
 export type Seg = string | { text: string; path: string };
 export type Line = Seg[];
-export type ShellState = { cwd: string; secret?: number; tries?: number };
-export type Effect = { open?: string; clear?: true; panic?: true; reset?: true; crt?: boolean };
+export type ShellState = { cwd: string; secret?: number; tries?: number; ai?: boolean };
+export type Effect = { ask?: string; open?: string; clear?: true; panic?: true; reset?: true; crt?: boolean };
 type Result = { out: Line[]; state: ShellState; effect?: Effect };
 
 export const HELP: Line[] = [
   ["commands:"],
   ["  help              this list"],
+  ["  ask [question]    ask my AI about me (no question: chat mode)"],
   ["  ls [-a] [dir]     list files (click a name to open it)"],
   ["  cd <dir>          change directory"],
   ["  cat <file>        print a file"],
@@ -23,7 +24,7 @@ export const HELP: Line[] = [
   ["  clear             clear the screen"],
 ];
 
-const COMMANDS = ["cat", "cd", "clear", "contact", "crt", "help", "ls", "neofetch", "open", "reset", "sudo", "whoami"];
+const COMMANDS = ["ask", "cat", "cd", "clear", "contact", "crt", "help", "ls", "neofetch", "open", "reset", "sudo", "whoami"];
 
 /**
  * Tab completion. Completes the command name, then the last argument as a path.
@@ -81,6 +82,12 @@ export function run(input: string, state: ShellState): Result {
   const arg = args.join(" ");
   const say = (...out: string[]): Result => ({ out: out.map((s) => [s]), state });
 
+  // ai chat mode: every line is a question
+  if (state.ai && line) {
+    if (cmd === "exit" || cmd === "quit") return { out: [["bye."]], state: { cwd: state.cwd } };
+    return { out: [], state, effect: { ask: line } };
+  }
+
   // hidden game: guess the number
   if (state.secret !== undefined && line) {
     if (cmd === "quit") return { out: [["bye."]], state: { cwd: state.cwd } };
@@ -96,6 +103,9 @@ export function run(input: string, state: ShellState): Result {
       return { out: [], state };
     case "help":
       return { out: HELP, state };
+    case "ask":
+      if (arg) return { out: [], state, effect: { ask: arg } };
+      return { out: [["chat mode: ask anything about Anish. `exit` to leave."]], state: { cwd: state.cwd, ai: true } };
     case "clear":
       return { out: [], state, effect: { clear: true } };
     case "whoami":
