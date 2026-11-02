@@ -51,7 +51,7 @@ textarea,
   cursor: text !important;
 }
 
-html:not([data-crt="off"]) body {
+html[data-crt="on"] body {
   text-shadow: var(--glow);
 }
 
@@ -74,7 +74,7 @@ html:not([data-crt="off"]) body {
     repeating-linear-gradient(to bottom, #0000 0 2px, #0006 2px 3px);
   animation: flicker 4s infinite steps(1);
 }
-html[data-crt="off"] .crt-overlay {
+html:not([data-crt="on"]) .crt-overlay {
   display: none;
 }
 @keyframes flicker {
