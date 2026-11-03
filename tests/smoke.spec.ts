@@ -8,6 +8,11 @@ test("first view has the recruiter essentials", async ({ page }) => {
     await expect(page.getByRole("button", { name })).toBeVisible();
 });
 
+test("top bar links straight to the resume PDF", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Resume" })).toHaveAttribute("href", /\/resume\.pdf$/);
+});
+
 test("name banner says who this is", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: /Anish Naik, software & AI developer, open to work/ })).toBeAttached();
@@ -17,7 +22,7 @@ test("name banner says who this is", async ({ page }) => {
 test("system panel shows role, location, modules and status", async ({ page }) => {
   await page.goto("/");
   const panel = page.getByRole("region", { name: "system info" });
-  await expect(panel).toContainText("Software Engineer @ Infuse (useMango)");
+  await expect(panel).toContainText("Software Engineer · ex-Infuse (useMango), Aug 2023 – Oct 2026");
   await expect(panel).toContainText(/\d+y \d+m since Aug 2023/);
   await expect(panel).toContainText("Goa, India");
   await expect(panel).toContainText("python · aws · ci-cd"); // from skills.json

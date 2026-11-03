@@ -65,7 +65,7 @@ test.describe("shell", () => {
     await input.press("Tab"); // completes
     await expect(input).toHaveValue("neofetch ");
     await input.press("Enter");
-    await expect(term(page)).toContainText("Software Engineer @ Infuse (useMango)");
+    await expect(term(page)).toContainText("Software Engineer · ex-Infuse (useMango), Aug 2023 – Oct 2026");
     await expect(term(page)).toContainText(/uptime\s+\d+y \d+m since Aug 2023/);
     await expect(term(page)).toContainText("python · aws · ci-cd");
     await expect(term(page)).toContainText("status: [open to work] backend / applied AI");

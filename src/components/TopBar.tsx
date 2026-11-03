@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { useLayout } from "@/lib/layout";
+import { asset } from "@/lib/fs";
 import { syncHum } from "@/lib/sound";
 import { TrayToggle } from "./TrayToggle";
 
@@ -60,18 +61,24 @@ export function TopBar() {
         </nav>
       </details>
       <time className="justify-self-center whitespace-nowrap">{clock}</time>
-      <details className="group relative justify-self-end">
-        <summary className={summary} aria-label="system menu">
-          [=] ▾
-        </summary>
-        <div className={`${menu} right-0`}>
-          <TrayToggle name="crt" defaultOn={false} className={item} />
-          <TrayToggle name="sound" defaultOn={false} onChange={syncHum} className={item} />
-          <button className={item} onClick={(e) => (reset(), shut(e))}>
-            reset layout
-          </button>
-        </div>
-      </details>
+      <div className="flex justify-self-end">
+        {/* plain PDF link: skips the desktop entirely */}
+        <a href={asset("/resume.pdf")} target="_blank" rel="noopener" className="px-3 hover:bg-background hover:text-foreground">
+          Resume
+        </a>
+        <details className="group relative">
+          <summary className={summary} aria-label="system menu">
+            [=] ▾
+          </summary>
+          <div className={`${menu} right-0`}>
+            <TrayToggle name="crt" defaultOn={false} className={item} />
+            <TrayToggle name="sound" defaultOn={false} onChange={syncHum} className={item} />
+            <button className={item} onClick={(e) => (reset(), shut(e))}>
+              reset layout
+            </button>
+          </div>
+        </details>
+      </div>
     </header>
   );
 }

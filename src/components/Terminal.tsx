@@ -10,7 +10,7 @@ import { Window } from "./Window";
 
 const WELCOME: Line[] = [["welcome to guestOS. type `help` (tab autocompletes), or just click around."], [""]];
 const CHARS_PER_TICK = 6; // every 16ms ≈ 375 chars/s
-const ASK_API = "https://resume-rag-one-mu.vercel.app/api/ask/stream";
+const ASK_API = process.env.NEXT_PUBLIC_ASK_API!;
 type Msg = { role: "user" | "assistant"; content: string };
 
 /** Streams an answer from the resume RAG backend. SSE events: {sources} once, {token} many, then {done} or {error}. */
@@ -109,7 +109,7 @@ function Shell({ ai = false }) {
     const show = (s: string) => setLines((ls) => [...ls.slice(0, at), ...s.split("\n").map((l): Line => [l])]);
     show("thinking...");
     try {
-      for await (const t of askStream(q, chat)) show((answer += t).replace(/\*\*/g, ""));
+      for await (const t of askStream(q, chat)) show((answer += t).replace(/\*\*|^#+ /gm, ""));
       const turn: Msg[] = [{ role: "user", content: q.slice(0, 4000) }, { role: "assistant", content: answer.slice(0, 4000) }];
       setChat((c) => [...c, ...turn].slice(-20));
     } catch {
