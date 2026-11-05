@@ -10,7 +10,7 @@ import { Window } from "./Window";
 
 const WELCOME: Line[] = [["welcome to guestOS. type `help` (tab autocompletes), or just click around."], [""]];
 const CHARS_PER_TICK = 6; // every 16ms ≈ 375 chars/s
-const ASK_API = process.env.NEXT_PUBLIC_ASK_API!;
+const ASK_API = process.env.NEXT_PUBLIC_ASK_API! || "https://resume-rag-one-mu.vercel.app/api/ask/stream";
 type Msg = { role: "user" | "assistant"; content: string };
 
 /** Streams an answer from the resume RAG backend. SSE events: {sources} once, {token} many, then {done} or {error}. */
@@ -39,7 +39,10 @@ async function* askStream(question: string, history: Msg[]) {
 
 const text = (l: Line) => l.map((s) => (typeof s === "string" ? s : s.text)).join("");
 
-const ASK_WELCOME: Line[] = [["ask me anything about Anish: experience, projects, skills. `exit` for a normal shell."], [""]];
+const ASK_WELCOME: Line[] = [
+  ["ask me anything about Anish: experience, projects, skills. `exit` for a normal shell."],
+  [""],
+];
 
 export function TerminalNode() {
   return (
@@ -110,7 +113,10 @@ function Shell({ ai = false }) {
     show("thinking...");
     try {
       for await (const t of askStream(q, chat)) show((answer += t).replace(/\*\*|^#+ /gm, ""));
-      const turn: Msg[] = [{ role: "user", content: q.slice(0, 4000) }, { role: "assistant", content: answer.slice(0, 4000) }];
+      const turn: Msg[] = [
+        { role: "user", content: q.slice(0, 4000) },
+        { role: "assistant", content: answer.slice(0, 4000) },
+      ];
       setChat((c) => [...c, ...turn].slice(-20));
     } catch {
       show("ask: the AI is unreachable right now. try again later, or `contact`.");
@@ -159,7 +165,10 @@ function Shell({ ai = false }) {
   return (
     <div onClick={() => !getSelection()?.toString() && inputRef.current?.focus()}>
       {/* phones: 3 icon rows (~440px, see grid() in layout.ts) + window chrome + bottom bar take ~34rem; the terminal gets the rest */}
-      <div ref={outRef} className="nodrag nowheel h-[min(18rem,35vh)] cursor-text max-md:h-[clamp(6rem,calc(100dvh-34rem),18rem)] overflow-auto select-text">
+      <div
+        ref={outRef}
+        className="nodrag nowheel h-[min(18rem,35vh)] cursor-text max-md:h-[clamp(6rem,calc(100dvh-34rem),18rem)] overflow-auto select-text"
+      >
         {/* screen readers get whole lines here instead of the typewriter */}
         <div aria-live="polite" className="sr-only">
           {lines.slice(0, typed.line).map((l, i) => (
@@ -179,7 +188,11 @@ function Shell({ ai = false }) {
                   return typeof s === "string" ? (
                     shown
                   ) : (
-                    <button key={j} onClick={() => open(s.path)} className="underline hover:bg-foreground hover:text-background">
+                    <button
+                      key={j}
+                      onClick={() => open(s.path)}
+                      className="underline hover:bg-foreground hover:text-background"
+                    >
                       {shown}
                     </button>
                   );
